@@ -31,10 +31,10 @@ Her klasör içerisinde ilgili NLP konusuna ait:
 - Örnek veri setleri bulunmaktadır.
 
 ## 🤝 Katkıda Bulunma
-Bu repoyu fork edin,
-Yeni bir branch oluşturun (git checkout -b feature/yeniOzellik)
-Değişikliklerinizi commit edin (git commit -am 'Yeni özellik eklendi')
-Branch'inizi push edin (git push origin feature/yeniOzellik)
-Pull Request oluşturun!
+- Bu repoyu fork edin,
+- Yeni bir branch oluşturun (git checkout -b feature/yeniOzellik)
+- Değişikliklerinizi commit edin (git commit -am 'Yeni özellik eklendi')
+- Branch'inizi push edin (git push origin feature/yeniOzellik)
+- Pull Request oluşturun!
 
 ## ✨ Teşekkürler
