@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brutalist Chaos Task UI</title>
+  <title>Chaos Tasks - fully interactive</title>
   <style>
     :root {
       --bg: #ffffff;
       --ink: #000000;
       --accent: #e8ff00;
       --shadow: 7px 7px 0 #000000;
+      --danger: #ff0000;
     }
 
     * {
@@ -21,10 +22,18 @@
       min-height: 100vh;
       display: grid;
       place-items: center;
-      background: #d7d7d7;
+      background: #cfcfcf;
       font-family: "Arial Black", Impact, system-ui, sans-serif;
       color: var(--ink);
       overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+      color: inherit;
     }
 
     .phone {
@@ -32,145 +41,232 @@
       width: 390px;
       height: 844px;
       border: 3px solid var(--ink);
-      background: var(--bg);
       box-shadow: 10px 10px 0 var(--ink);
+      background: var(--bg);
       overflow: hidden;
+      isolation: isolate;
     }
 
     .today-banner {
       position: absolute;
-      top: 18px;
-      left: 14px;
+      top: 16px;
+      left: 12px;
       transform: rotate(-4deg);
-      background: var(--accent);
       border: 3px solid var(--ink);
+      background: var(--accent);
       box-shadow: var(--shadow);
-      padding: 8px 14px;
-      text-transform: uppercase;
-      font-size: 2rem;
-      line-height: 1;
-      letter-spacing: 0.05em;
-      z-index: 40;
+      padding: 8px 12px;
+      z-index: 45;
+      min-width: 224px;
     }
 
-    .today-banner .mono {
-      display: block;
+    .today-banner h1 {
+      margin: 0;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      font-size: 1.85rem;
+      text-transform: uppercase;
+    }
+
+    .today-meta {
+      margin-top: 4px;
       font-family: "Courier New", Courier, monospace;
-      font-size: 0.7rem;
-      margin-top: 5px;
-      transform: rotate(2deg);
+      font-size: 0.71rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .panel-controls {
+      position: absolute;
+      top: 108px;
+      left: 8px;
+      width: 372px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      transform: rotate(1deg);
+      z-index: 42;
+    }
+
+    .ctrl-btn {
+      border: 3px solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+      background: #fff;
+      padding: 4px 8px;
+      text-transform: uppercase;
+      font-size: 0.64rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+    }
+
+    .ctrl-btn.active {
+      background: var(--accent);
     }
 
     .sticky-fragment {
       position: absolute;
       top: 22px;
       right: -4px;
-      width: 128px;
-      min-height: 74px;
-      padding: 9px 10px;
+      width: 134px;
       border: 3px solid var(--ink);
       box-shadow: 6px 6px 0 var(--ink);
+      padding: 8px 9px;
       background: #fff;
-      transform: rotate(11deg);
+      transform: rotate(9deg);
+      z-index: 30;
+    }
+
+    .sticky-fragment textarea {
+      width: 100%;
+      min-height: 62px;
+      resize: none;
+      border: 0;
+      background: transparent;
       font-family: "Comic Sans MS", "Segoe Print", cursive;
-      font-size: 0.95rem;
-      z-index: 18;
+      font-size: 0.9rem;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .sticky-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 3px;
+    }
+
+    .sticky-actions button {
+      flex: 1;
+      border: 2px solid var(--ink);
+      background: var(--accent);
+      font-size: 0.54rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .board {
+      position: absolute;
+      top: 150px;
+      left: 0;
+      width: 100%;
+      height: 420px;
+      z-index: 20;
     }
 
     .task-card {
       position: absolute;
-      background: #fff;
       border: 3px solid var(--ink);
+      background: #fff;
       box-shadow: var(--shadow);
-      padding: 10px 12px;
-      line-height: 1.25;
-      z-index: 10;
+      padding: 10px 10px 8px;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    .task-card.urgent {
+      background: var(--accent);
+      width: 316px;
+      min-height: 152px;
+      z-index: 40;
+    }
+
+    .task-card.done {
+      width: 252px;
+      min-height: 126px;
+      z-index: 33;
+    }
+
+    .task-card.ignored {
+      width: 174px;
+      min-height: 94px;
+      opacity: 0.63;
+      z-index: 17;
+    }
+
+    .task-card.low {
+      width: 138px;
+      min-height: 88px;
+      opacity: 0.65;
+      z-index: 16;
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
     }
 
     .task-card h3 {
       margin: 0;
-      font-size: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.15;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      max-width: 78%;
     }
 
-    .task-card p {
-      margin: 6px 0 0;
-      font-size: 0.77rem;
-      font-family: "Courier New", Courier, monospace;
-      font-weight: 700;
-    }
-
-    .urgent {
-      top: 120px;
-      left: 8px;
-      width: 320px;
-      min-height: 172px;
-      transform: rotate(-6deg);
-      background: var(--accent);
-      z-index: 30;
-    }
-
-    .urgent h3 {
-      font-size: 1.3rem;
-    }
-
-    .done {
-      top: 276px;
-      left: 58px;
-      width: 262px;
-      min-height: 122px;
-      transform: rotate(5deg);
-      background: #fff;
-      z-index: 20;
-    }
-
-    .done h3 {
+    .task-card.done h3 {
       text-decoration: line-through;
       text-decoration-thickness: 3px;
     }
 
-    .ignored {
-      top: 339px;
-      left: -18px;
-      width: 184px;
-      min-height: 104px;
-      transform: rotate(-10deg);
-      opacity: 0.65;
-      z-index: 9;
+    .task-desc {
+      margin: 7px 0 0;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.74rem;
+      font-weight: 700;
+      line-height: 1.25;
     }
 
-    .tiny {
-      top: 438px;
-      right: 16px;
-      width: 134px;
-      min-height: 78px;
-      transform: rotate(13deg);
-      font-size: 0.74rem;
-      opacity: 0.6;
-      z-index: 8;
+    .chip-wrap {
+      display: grid;
+      gap: 3px;
+      text-align: right;
+    }
+
+    .chip {
+      border: 2px solid var(--ink);
+      font-size: 0.55rem;
+      padding: 1px 4px;
+      background: #fff;
+      font-family: "Courier New", Courier, monospace;
+      text-transform: uppercase;
     }
 
     .checkbox-row {
+      margin-top: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 10px;
-      font-size: 0.85rem;
       font-family: "Courier New", Courier, monospace;
+      font-size: 0.74rem;
       font-weight: 700;
     }
 
-    .checkbox-square {
-      width: 18px;
-      height: 18px;
-      border: 3px solid var(--ink);
-      background: #fff;
-      position: relative;
+    .checkbox-btn {
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
       flex: 0 0 auto;
     }
 
-    .checkbox-square.checked::after {
+    .checkbox-box,
+    .checkbox-hand {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--ink);
+      background: #fff;
+      position: relative;
+    }
+
+    .checkbox-hand {
+      border-radius: 47% 53% 45% 55% / 40% 52% 48% 60%;
+      transform: rotate(-7deg);
+    }
+
+    .checkbox-box.checked::after {
       content: "";
       position: absolute;
       left: 3px;
@@ -182,39 +278,155 @@
       transform: rotate(45deg);
     }
 
-    .checkbox-hand {
-      position: relative;
-      width: 20px;
-      height: 20px;
-      border: 3px solid var(--ink);
-      border-radius: 43% 57% 51% 49% / 38% 53% 47% 62%;
-      transform: rotate(-8deg);
-      background: #fff;
-      flex: 0 0 auto;
-    }
-
     .checkbox-hand.checked::after {
       content: "x";
       position: absolute;
-      left: 3px;
+      left: 4px;
       top: -3px;
-      font-size: 1.15rem;
       font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-size: 1.12rem;
       font-weight: 900;
+    }
+
+    .task-actions {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .task-actions button {
+      border: 2px solid var(--ink);
+      background: #fff;
+      padding: 1px 4px;
+      font-size: 0.56rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .task-actions button:hover {
+      background: var(--accent);
+    }
+
+    .fragment-list {
+      position: absolute;
+      top: 572px;
+      left: -28px;
+      width: 440px;
+      min-height: 294px;
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      background: #fff;
+      transform: rotate(-3deg);
+      padding: 13px 16px 20px;
+      z-index: 21;
+      overflow: hidden;
+    }
+
+    .fragment-list h2 {
+      margin: 0;
+      display: inline-block;
+      border: 3px solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+      background: var(--accent);
+      transform: rotate(2deg);
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+    }
+
+    .fragment-list p {
+      margin: 6px 0 0;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .fragment-items {
+      margin-top: 9px;
+      display: grid;
+      gap: 8px;
+      max-height: 215px;
+      overflow: auto;
+      padding-right: 10px;
+    }
+
+    .fragment-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+      border: 2px solid var(--ink);
+      padding: 6px;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+      font-size: 0.73rem;
+    }
+
+    .fragment-item.ignored {
+      opacity: 0.55;
+      transform: rotate(-1deg);
+    }
+
+    .mini-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .mini-actions button {
+      border: 2px solid var(--ink);
+      background: #fff;
+      font-size: 0.53rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 1px 4px;
+    }
+
+    .fab {
+      position: absolute;
+      right: -8px;
+      top: 504px;
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      background: var(--accent);
+      font-size: 2.5rem;
+      line-height: 1;
+      cursor: pointer;
+      transform: rotate(12deg);
+      z-index: 60;
+    }
+
+    .crossed {
+      position: absolute;
+      left: 16px;
+      top: 538px;
+      margin: 0;
+      transform: rotate(-6deg);
+      text-decoration: line-through;
+      text-decoration-thickness: 3px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.88rem;
+      z-index: 35;
+    }
+
+    .decor {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 48;
     }
 
     .scribble {
       position: absolute;
       font-family: "Comic Sans MS", "Segoe Print", cursive;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 900;
-      transform-origin: center;
-      z-index: 45;
     }
-
-    .scribble.s1 { top: 228px; right: 22px; transform: rotate(-14deg); }
-    .scribble.s2 { top: 320px; left: 14px; transform: rotate(13deg); }
-    .scribble.s3 { top: 506px; left: 236px; transform: rotate(-22deg); }
 
     .dot {
       position: absolute;
@@ -222,205 +434,588 @@
       height: 8px;
       background: var(--ink);
       border-radius: 50%;
-      z-index: 44;
     }
 
-    .dot.d1 { top: 109px; left: 78px; }
-    .dot.d2 { top: 180px; left: 348px; }
-    .dot.d3 { top: 262px; right: 18px; }
-    .dot.d4 { top: 532px; left: 34px; }
-    .dot.d5 { top: 608px; left: 171px; }
-
-    .arrow {
+    .composer {
       position: absolute;
-      font-size: 1.55rem;
-      font-family: "Courier New", Courier, monospace;
-      font-weight: 900;
-      z-index: 46;
-    }
-
-    .arrow.a1 { top: 88px; right: 116px; transform: rotate(19deg); }
-    .arrow.a2 { top: 398px; left: 130px; transform: rotate(-27deg); }
-
-    .crossed {
-      position: absolute;
-      top: 522px;
       left: 24px;
-      transform: rotate(-5deg);
-      font-size: 0.9rem;
-      z-index: 22;
-      font-family: "Courier New", Courier, monospace;
-      text-decoration: line-through;
-      text-decoration-thickness: 3px;
-    }
-
-    .fragment-list {
-      position: absolute;
-      top: 586px;
-      left: -28px;
-      width: 438px;
-      min-height: 294px;
+      right: 24px;
+      top: 210px;
       border: 3px solid var(--ink);
-      box-shadow: var(--shadow);
+      box-shadow: 8px 8px 0 var(--ink);
       background: #fff;
-      transform: rotate(-3deg);
-      padding: 14px 18px 20px;
-      z-index: 13;
+      z-index: 78;
+      padding: 10px;
+      transform: rotate(-2deg);
+      display: none;
     }
 
-    .fragment-list h4 {
-      margin: 0;
-      font-size: 1rem;
-      letter-spacing: 0.1em;
+    .composer.open {
+      display: block;
+    }
+
+    .composer h3 {
+      margin: 0 0 8px;
       text-transform: uppercase;
+      background: var(--accent);
+      border: 3px solid var(--ink);
       display: inline-block;
-      background: var(--accent);
-      border: 3px solid var(--ink);
-      padding: 3px 9px;
-      transform: rotate(2deg);
+      padding: 2px 8px;
+      font-size: 0.96rem;
     }
 
-    .fragment-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin-top: 10px;
+    .composer label {
+      display: block;
+      margin-top: 6px;
       font-family: "Courier New", Courier, monospace;
+      font-size: 0.7rem;
       font-weight: 700;
-      font-size: 0.82rem;
+      text-transform: uppercase;
     }
 
-    .fragment-item.ignored {
-      position: static;
-      width: auto;
-      min-height: auto;
-      transform: rotate(0deg);
-      border: none;
-      box-shadow: none;
-      opacity: 0.5;
-      padding: 0;
-      background: transparent;
-      margin-top: 8px;
-    }
-
-    .fab {
-      position: absolute;
-      right: -8px;
-      top: 517px;
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
+    .composer input,
+    .composer textarea,
+    .composer select {
+      width: 100%;
       border: 3px solid var(--ink);
-      background: var(--accent);
-      box-shadow: var(--shadow);
-      display: grid;
-      place-items: center;
-      font-size: 2.5rem;
-      line-height: 1;
-      transform: rotate(13deg);
-      z-index: 51;
-    }
-
-    .note-rough {
-      position: absolute;
-      left: 206px;
-      top: 474px;
-      width: 162px;
-      min-height: 86px;
-      padding: 8px 10px;
-      border: 3px solid var(--ink);
-      box-shadow: var(--shadow);
-      transform: rotate(-8deg);
       background: #fff;
-      font-family: "Comic Sans MS", "Segoe Print", cursive;
-      font-size: 1rem;
-      z-index: 25;
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 5px;
+      margin-top: 2px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .composer textarea {
+      min-height: 62px;
+      resize: none;
+    }
+
+    .composer-actions {
+      margin-top: 9px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 7px;
+    }
+
+    .composer-actions button {
+      border: 3px solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+      background: #fff;
+      text-transform: uppercase;
+      font-size: 0.66rem;
+      padding: 3px 9px;
+      cursor: pointer;
+    }
+
+    .composer-actions .save-btn {
+      background: var(--accent);
+    }
+
+    .accent-red {
+      --accent: var(--danger);
     }
   </style>
 </head>
 <body>
-  <main class="phone" aria-label="Chaotic task management interface">
+  <main class="phone" aria-label="Chaos task app">
     <section class="today-banner">
-      TODAY
-      <span class="mono">9 TASKS // 3 CHAOS LEVEL</span>
+      <h1>Today</h1>
+      <div id="todayMeta" class="today-meta"></div>
     </section>
 
     <aside class="sticky-fragment">
-      stop pretending this is organized
+      <textarea id="scratchpad" aria-label="Scribble note"></textarea>
+      <div class="sticky-actions">
+        <button id="saveScratch" type="button">save</button>
+        <button id="strikeScratch" type="button">strike</button>
+      </div>
     </aside>
 
-    <article class="task-card urgent">
-      <h3>URGENT: Submit bugfix before 11:00</h3>
-      <p>Owner: Me // status: loud panic</p>
-      <div class="checkbox-row">
-        <span class="checkbox-square"></span>
-        <span>push branch + tag release notes</span>
-      </div>
-      <div class="checkbox-row">
-        <span class="checkbox-hand checked"></span>
-        <span>coffee x2</span>
-      </div>
-    </article>
-
-    <article class="task-card done">
-      <h3>Done: sent invoice draft</h3>
-      <p>archived but still haunting</p>
-      <div class="checkbox-row">
-        <span class="checkbox-square checked"></span>
-        <span>marked complete at 08:04</span>
-      </div>
-    </article>
-
-    <article class="task-card ignored">
-      <h3>Ignored: clean downloads folder</h3>
-      <p>maybe next lifetime</p>
-    </article>
-
-    <article class="task-card tiny">
-      <h3>low: water plant</h3>
-      <p>dry but patient</p>
-    </article>
-
-    <aside class="note-rough">
-      call mom<br />
-      write docs<br />
-      definitely sleep
-    </aside>
-
-    <p class="crossed">crossed out: "be normal"</p>
-
-    <section class="fragment-list">
-      <h4>Fragmented list</h4>
-      <div class="fragment-item">
-        <span class="checkbox-hand"></span>
-        <span>reply to 17 unread messages</span>
-      </div>
-      <div class="fragment-item">
-        <span class="checkbox-square checked"></span>
-        <span>break production (accidentally)</span>
-      </div>
-      <div class="fragment-item ignored">
-        <span class="checkbox-square"></span>
-        <span>organize desk cables</span>
-      </div>
-      <div class="fragment-item">
-        <span class="checkbox-hand checked"></span>
-        <span>draft "chaos is a process" manifesto</span>
-      </div>
+    <section class="panel-controls" aria-label="Task controls">
+      <button class="ctrl-btn active" type="button" data-filter="all">all</button>
+      <button class="ctrl-btn" type="button" data-filter="urgent">urgent</button>
+      <button class="ctrl-btn" type="button" data-filter="done">done</button>
+      <button class="ctrl-btn" type="button" data-filter="ignored">ignored</button>
+      <button class="ctrl-btn" type="button" id="shuffleBtn">shuffle chaos</button>
+      <button class="ctrl-btn" type="button" id="clearDoneBtn">wipe done</button>
+      <button class="ctrl-btn" type="button" id="accentBtn">swap accent</button>
     </section>
 
-    <button class="fab" aria-label="Add task">+</button>
+    <section id="board" class="board" aria-live="polite"></section>
 
-    <span class="scribble s1">!!!</span>
-    <span class="scribble s2">nope</span>
-    <span class="scribble s3">rush</span>
-    <span class="arrow a1">↯</span>
-    <span class="arrow a2">↘</span>
-    <span class="dot d1"></span>
-    <span class="dot d2"></span>
-    <span class="dot d3"></span>
-    <span class="dot d4"></span>
-    <span class="dot d5"></span>
+    <p class="crossed">crossed out: be normal</p>
+
+    <section class="fragment-list">
+      <h2>Fragmented list</h2>
+      <p>broken tasks below the fold, still alive</p>
+      <div id="fragmentItems" class="fragment-items"></div>
+    </section>
+
+    <button class="fab" id="addTaskBtn" type="button" aria-label="Add task">+</button>
+
+    <section class="decor" aria-hidden="true">
+      <span id="scribble1" class="scribble" style="top: 228px; right: 21px; transform: rotate(-15deg);">!!!</span>
+      <span id="scribble2" class="scribble" style="top: 316px; left: 13px; transform: rotate(12deg);">rush</span>
+      <span id="scribble3" class="scribble" style="top: 502px; left: 234px; transform: rotate(-19deg);">nope</span>
+      <span class="dot" style="top: 112px; left: 72px;"></span>
+      <span class="dot" style="top: 180px; left: 349px;"></span>
+      <span class="dot" style="top: 262px; right: 18px;"></span>
+      <span class="dot" style="top: 532px; left: 35px;"></span>
+      <span class="dot" style="top: 606px; left: 173px;"></span>
+    </section>
+
+    <section id="composer" class="composer" aria-label="Task composer">
+      <h3 id="composerTitle">Add task</h3>
+      <label for="taskTitle">Task title</label>
+      <input id="taskTitle" maxlength="64" />
+      <label for="taskDetail">Detail</label>
+      <textarea id="taskDetail" maxlength="120"></textarea>
+      <label for="taskPriority">Priority</label>
+      <select id="taskPriority">
+        <option value="high">high</option>
+        <option value="medium">medium</option>
+        <option value="low">low</option>
+      </select>
+      <label for="taskState">State</label>
+      <select id="taskState">
+        <option value="todo">todo</option>
+        <option value="urgent">urgent</option>
+        <option value="done">done</option>
+        <option value="ignored">ignored</option>
+      </select>
+      <div class="composer-actions">
+        <button id="cancelTaskBtn" type="button">cancel</button>
+        <button id="saveTaskBtn" class="save-btn" type="button">save</button>
+      </div>
+    </section>
   </main>
+
+  <script>
+    (function () {
+      const TASKS_KEY = "chaosTasks.v2";
+      const SCRATCH_KEY = "chaosScratch.v2";
+      const ACCENT_KEY = "chaosAccent.v2";
+      const FILTERS = new Set(["all", "urgent", "done", "ignored"]);
+      const LAYOUTS = [
+        { top: 6, left: 8, rotate: -7 },
+        { top: 128, left: 56, rotate: 5 },
+        { top: 197, left: -18, rotate: -11 },
+        { top: 258, left: 198, rotate: 10 },
+        { top: 48, left: 204, rotate: -5 },
+        { top: 238, left: 88, rotate: -3 },
+        { top: 302, left: 8, rotate: 8 }
+      ];
+      const SCRIBBLES = ["rush", "nah", "panic", "ship it", "chaos", "later", "oops"];
+
+      const state = {
+        tasks: [],
+        filter: "all",
+        editingId: null,
+        chaosShift: 0,
+        accent: "yellow",
+        scratchedOut: false
+      };
+
+      const nodes = {
+        phone: document.querySelector(".phone"),
+        board: document.getElementById("board"),
+        todayMeta: document.getElementById("todayMeta"),
+        fragmentItems: document.getElementById("fragmentItems"),
+        addTaskBtn: document.getElementById("addTaskBtn"),
+        composer: document.getElementById("composer"),
+        composerTitle: document.getElementById("composerTitle"),
+        taskTitle: document.getElementById("taskTitle"),
+        taskDetail: document.getElementById("taskDetail"),
+        taskPriority: document.getElementById("taskPriority"),
+        taskState: document.getElementById("taskState"),
+        cancelTaskBtn: document.getElementById("cancelTaskBtn"),
+        saveTaskBtn: document.getElementById("saveTaskBtn"),
+        shuffleBtn: document.getElementById("shuffleBtn"),
+        clearDoneBtn: document.getElementById("clearDoneBtn"),
+        accentBtn: document.getElementById("accentBtn"),
+        scratchpad: document.getElementById("scratchpad"),
+        saveScratch: document.getElementById("saveScratch"),
+        strikeScratch: document.getElementById("strikeScratch"),
+        scribble1: document.getElementById("scribble1"),
+        scribble2: document.getElementById("scribble2"),
+        scribble3: document.getElementById("scribble3")
+      };
+
+      function seedTasks() {
+        return [
+          {
+            id: makeId(),
+            title: "Submit bugfix before 11:00",
+            detail: "owner me // deploy notes still missing",
+            state: "urgent",
+            priority: "high",
+            checkboxStyle: "box"
+          },
+          {
+            id: makeId(),
+            title: "Send invoice draft",
+            detail: "done but still staring at me",
+            state: "done",
+            priority: "medium",
+            checkboxStyle: "hand"
+          },
+          {
+            id: makeId(),
+            title: "Clean downloads folder",
+            detail: "ignored forever maybe",
+            state: "ignored",
+            priority: "low",
+            checkboxStyle: "box"
+          },
+          {
+            id: makeId(),
+            title: "Water plant",
+            detail: "still alive somehow",
+            state: "todo",
+            priority: "low",
+            checkboxStyle: "hand"
+          },
+          {
+            id: makeId(),
+            title: "Reply unread messages",
+            detail: "17 threads already on fire",
+            state: "todo",
+            priority: "medium",
+            checkboxStyle: "box"
+          }
+        ];
+      }
+
+      function makeId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      }
+
+      function load() {
+        try {
+          const raw = localStorage.getItem(TASKS_KEY);
+          state.tasks = raw ? JSON.parse(raw) : seedTasks();
+          if (!Array.isArray(state.tasks) || !state.tasks.length) {
+            state.tasks = seedTasks();
+          }
+        } catch (_err) {
+          state.tasks = seedTasks();
+        }
+
+        nodes.scratchpad.value = localStorage.getItem(SCRATCH_KEY) || "stop pretending this is organized";
+        state.accent = localStorage.getItem(ACCENT_KEY) || "yellow";
+        if (state.accent === "red") {
+          nodes.phone.classList.add("accent-red");
+        }
+      }
+
+      function persist() {
+        localStorage.setItem(TASKS_KEY, JSON.stringify(state.tasks));
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function renderMeta() {
+        const all = state.tasks.length;
+        const urgent = state.tasks.filter((task) => task.state === "urgent").length;
+        const done = state.tasks.filter((task) => task.state === "done").length;
+        const ignored = state.tasks.filter((task) => task.state === "ignored").length;
+        const open = all - done - ignored;
+        nodes.todayMeta.textContent = all + " tasks // open " + open + " // urgent " + urgent + " // done " + done + " // ignored " + ignored;
+      }
+
+      function filterTasks() {
+        if (state.filter === "all") {
+          return state.tasks.slice();
+        }
+        return state.tasks.filter((task) => task.state === state.filter);
+      }
+
+      function computeLayout(index, task) {
+        const base = LAYOUTS[index % LAYOUTS.length];
+        const randomShift = (state.chaosShift + index * 3) % 17;
+        const x = base.left + randomShift - 8;
+        const y = base.top + ((state.chaosShift * 2 + index * 9) % 21) - 10;
+        const rotation = base.rotate + ((state.chaosShift + index) % 7) - 3;
+        let width = "";
+        if (task.priority === "low") {
+          width = "138px";
+        }
+        if (task.priority === "high" || task.state === "urgent") {
+          width = "316px";
+        }
+        return { x: x, y: y, rotation: rotation, width: width };
+      }
+
+      function cardClass(task) {
+        const classes = ["task-card"];
+        if (task.state === "urgent") classes.push("urgent");
+        if (task.state === "done") classes.push("done");
+        if (task.state === "ignored") classes.push("ignored");
+        if (task.priority === "low") classes.push("low");
+        return classes.join(" ");
+      }
+
+      function taskDone(task) {
+        return task.state === "done";
+      }
+
+      function renderBoard() {
+        const visible = filterTasks();
+        nodes.board.innerHTML = "";
+
+        visible.forEach((task, index) => {
+          const layout = computeLayout(index, task);
+          const done = taskDone(task);
+          const card = document.createElement("article");
+          card.className = cardClass(task);
+          card.dataset.id = task.id;
+          card.style.top = layout.y + "px";
+          card.style.left = layout.x + "px";
+          card.style.transform = "rotate(" + layout.rotation + "deg)";
+          if (layout.width) {
+            card.style.width = layout.width;
+          }
+
+          const checkClass = task.checkboxStyle === "hand" ? "checkbox-hand" : "checkbox-box";
+          card.innerHTML =
+            '<div class="task-header">' +
+            "<h3>" + escapeHtml(task.title) + "</h3>" +
+            '<div class="chip-wrap">' +
+            '<span class="chip">' + task.state + "</span>" +
+            '<span class="chip">' + task.priority + "</span>" +
+            "</div>" +
+            "</div>" +
+            '<p class="task-desc">' + escapeHtml(task.detail) + "</p>" +
+            '<div class="checkbox-row">' +
+            '<button class="checkbox-btn" type="button" data-action="toggle-done" aria-label="Toggle done">' +
+            '<span class="' + checkClass + (done ? " checked" : "") + '"></span>' +
+            "</button>" +
+            "<span>" + (done ? "done-ish" : "still pending") + "</span>" +
+            "</div>" +
+            '<div class="task-actions">' +
+            '<button type="button" data-action="urgent">urgent</button>' +
+            '<button type="button" data-action="ignore">ignore</button>' +
+            '<button type="button" data-action="edit">edit</button>' +
+            '<button type="button" data-action="delete">delete</button>' +
+            "</div>";
+          nodes.board.appendChild(card);
+        });
+      }
+
+      function renderFragmentList() {
+        const items = state.tasks
+          .filter((task) => task.priority === "low" || task.state === "ignored" || task.state === "todo")
+          .slice(0, 9);
+
+        nodes.fragmentItems.innerHTML = "";
+        items.forEach((task) => {
+          const row = document.createElement("div");
+          row.className = "fragment-item" + (task.state === "ignored" ? " ignored" : "");
+          row.dataset.id = task.id;
+          row.innerHTML =
+            "<span>" + escapeHtml(task.title) + " (" + task.state + ")</span>" +
+            '<div class="mini-actions">' +
+            '<button type="button" data-frag-action="restore">restore</button>' +
+            '<button type="button" data-frag-action="done">done</button>' +
+            "</div>";
+          nodes.fragmentItems.appendChild(row);
+        });
+      }
+
+      function renderFilterButtons() {
+        document.querySelectorAll("[data-filter]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.filter === state.filter);
+        });
+      }
+
+      function renderScribbles() {
+        const index = state.chaosShift % SCRIBBLES.length;
+        nodes.scribble1.textContent = SCRIBBLES[index];
+        nodes.scribble2.textContent = SCRIBBLES[(index + 2) % SCRIBBLES.length];
+        nodes.scribble3.textContent = SCRIBBLES[(index + 4) % SCRIBBLES.length];
+      }
+
+      function render() {
+        renderMeta();
+        renderFilterButtons();
+        renderBoard();
+        renderFragmentList();
+        renderScribbles();
+      }
+
+      function setTaskState(task, nextState) {
+        task.state = nextState;
+      }
+
+      function findTaskById(id) {
+        return state.tasks.find((task) => task.id === id);
+      }
+
+      function handleBoardClick(event) {
+        const actionButton = event.target.closest("[data-action]");
+        if (!actionButton) return;
+        const card = event.target.closest(".task-card");
+        if (!card) return;
+        const task = findTaskById(card.dataset.id);
+        if (!task) return;
+
+        const action = actionButton.dataset.action;
+        if (action === "toggle-done") {
+          setTaskState(task, task.state === "done" ? "todo" : "done");
+        } else if (action === "urgent") {
+          setTaskState(task, task.state === "urgent" ? "todo" : "urgent");
+          task.priority = "high";
+        } else if (action === "ignore") {
+          setTaskState(task, task.state === "ignored" ? "todo" : "ignored");
+        } else if (action === "delete") {
+          state.tasks = state.tasks.filter((item) => item.id !== task.id);
+        } else if (action === "edit") {
+          openComposer(task);
+          return;
+        }
+
+        persist();
+        render();
+      }
+
+      function handleFragmentClick(event) {
+        const button = event.target.closest("[data-frag-action]");
+        if (!button) return;
+        const row = event.target.closest(".fragment-item");
+        if (!row) return;
+        const task = findTaskById(row.dataset.id);
+        if (!task) return;
+
+        const action = button.dataset.fragAction;
+        if (action === "restore") {
+          setTaskState(task, "todo");
+        } else if (action === "done") {
+          setTaskState(task, "done");
+        }
+
+        persist();
+        render();
+      }
+
+      function openComposer(task) {
+        state.editingId = task ? task.id : null;
+        nodes.composer.classList.add("open");
+        nodes.composerTitle.textContent = task ? "Edit task" : "Add task";
+        nodes.taskTitle.value = task ? task.title : "";
+        nodes.taskDetail.value = task ? task.detail : "";
+        nodes.taskPriority.value = task ? task.priority : "medium";
+        nodes.taskState.value = task ? task.state : "todo";
+        nodes.taskTitle.focus();
+      }
+
+      function closeComposer() {
+        state.editingId = null;
+        nodes.composer.classList.remove("open");
+      }
+
+      function saveComposer() {
+        const title = nodes.taskTitle.value.trim();
+        const detail = nodes.taskDetail.value.trim();
+        const priority = nodes.taskPriority.value;
+        const nextState = nodes.taskState.value;
+        if (!title) {
+          nodes.taskTitle.focus();
+          return;
+        }
+
+        if (state.editingId) {
+          const task = findTaskById(state.editingId);
+          if (task) {
+            task.title = title;
+            task.detail = detail || "no detail";
+            task.priority = priority;
+            task.state = nextState;
+          }
+        } else {
+          state.tasks.unshift({
+            id: makeId(),
+            title: title,
+            detail: detail || "no detail",
+            state: nextState,
+            priority: priority,
+            checkboxStyle: Math.random() > 0.5 ? "box" : "hand"
+          });
+        }
+
+        persist();
+        closeComposer();
+        render();
+      }
+
+      function shuffleChaos() {
+        state.chaosShift = (state.chaosShift + 5 + Math.floor(Math.random() * 13)) % 1000;
+        render();
+      }
+
+      function wipeDone() {
+        state.tasks = state.tasks.filter((task) => task.state !== "done");
+        persist();
+        render();
+      }
+
+      function setFilter(filter) {
+        if (!FILTERS.has(filter)) return;
+        state.filter = filter;
+        render();
+      }
+
+      function toggleAccent() {
+        state.accent = state.accent === "yellow" ? "red" : "yellow";
+        nodes.phone.classList.toggle("accent-red", state.accent === "red");
+        localStorage.setItem(ACCENT_KEY, state.accent);
+      }
+
+      function saveScratch() {
+        localStorage.setItem(SCRATCH_KEY, nodes.scratchpad.value);
+      }
+
+      function strikeScratch() {
+        state.scratchedOut = !state.scratchedOut;
+        nodes.scratchpad.style.textDecoration = state.scratchedOut ? "line-through" : "none";
+        nodes.scratchpad.style.textDecorationThickness = state.scratchedOut ? "3px" : "0";
+      }
+
+      function attachEvents() {
+        nodes.board.addEventListener("click", handleBoardClick);
+        nodes.fragmentItems.addEventListener("click", handleFragmentClick);
+
+        document.querySelectorAll("[data-filter]").forEach((button) => {
+          button.addEventListener("click", function () {
+            setFilter(button.dataset.filter);
+          });
+        });
+
+        nodes.addTaskBtn.addEventListener("click", function () {
+          openComposer(null);
+        });
+        nodes.cancelTaskBtn.addEventListener("click", closeComposer);
+        nodes.saveTaskBtn.addEventListener("click", saveComposer);
+        nodes.shuffleBtn.addEventListener("click", shuffleChaos);
+        nodes.clearDoneBtn.addEventListener("click", wipeDone);
+        nodes.accentBtn.addEventListener("click", toggleAccent);
+        nodes.saveScratch.addEventListener("click", saveScratch);
+        nodes.strikeScratch.addEventListener("click", strikeScratch);
+      }
+
+      load();
+      attachEvents();
+      render();
+    })();
+  </script>
 </body>
 </html>
