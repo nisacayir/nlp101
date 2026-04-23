@@ -3,19 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Görev Takibi - Mobil Uygulama</title>
+  <title>Pomelli Görev Akışı</title>
   <style>
     :root {
-      --arka-plan: #f3f5f9;
-      --kart: #ffffff;
-      --metin: #1a1d26;
-      --ikincil-metin: #5a6273;
-      --kenar: #d9deea;
-      --vurgu: #2563eb;
-      --vurgu-soluk: #dbeafe;
-      --hata: #dc2626;
-      --golge: 0 10px 24px rgba(17, 24, 39, 0.12);
-      --yaricap: 14px;
+      --zemin: #f3f5ff;
+      --metin: #111827;
+      --metin-soluk: #5b6479;
+      --cam: rgba(255, 255, 255, 0.42);
+      --cam-kenar: rgba(255, 255, 255, 0.72);
+      --cam-golge: 0 22px 45px rgba(67, 40, 160, 0.18);
+      --ana-1: #ff4fb2;
+      --ana-2: #4cc9ff;
+      --ana-3: #7df58a;
+      --vurgu: #7c3aed;
+      --tehlike: #e11d48;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
     }
 
     * {
@@ -27,9 +31,14 @@
       min-height: 100vh;
       display: grid;
       place-items: center;
-      background: linear-gradient(180deg, #e8edf7 0%, #f7f8fc 100%);
-      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 700px at 10% 0%, #ffd4f0 0%, rgba(255, 212, 240, 0) 60%),
+        radial-gradient(950px 700px at 100% 10%, #b3edff 0%, rgba(179, 237, 255, 0) 62%),
+        radial-gradient(900px 600px at 40% 100%, #d8ffd9 0%, rgba(216, 255, 217, 0) 58%),
+        var(--zemin);
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
       color: var(--metin);
+      padding: 20px;
     }
 
     button,
@@ -43,80 +52,139 @@
     .telefon {
       width: 390px;
       height: 844px;
-      background: var(--arka-plan);
-      border: 1px solid #cfd6e6;
-      border-radius: 18px;
-      box-shadow: var(--golge);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.32)),
+        linear-gradient(130deg, rgba(255, 79, 178, 0.2), rgba(76, 201, 255, 0.18));
+      box-shadow:
+        0 30px 55px rgba(37, 21, 96, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
       overflow: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
+      isolation: isolate;
+    }
+
+    .isiltilar {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .isilti {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(6px);
+      opacity: 0.7;
+    }
+
+    .isilti.bir {
+      width: 150px;
+      height: 150px;
+      top: -28px;
+      right: -24px;
+      background: radial-gradient(circle, #ff7ac6 0%, #ff4fb2 60%, transparent 100%);
+    }
+
+    .isilti.iki {
+      width: 170px;
+      height: 170px;
+      left: -58px;
+      top: 260px;
+      background: radial-gradient(circle, #8ee8ff 0%, #4cc9ff 62%, transparent 100%);
+    }
+
+    .isilti.uc {
+      width: 180px;
+      height: 180px;
+      right: -80px;
+      bottom: 180px;
+      background: radial-gradient(circle, #b7ffcb 0%, #7df58a 62%, transparent 100%);
+    }
+
+    .ust,
+    .duzenleyici,
+    .not-karti,
+    .gorev-karti,
+    .modal-icerik {
+      background: var(--cam);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--cam-kenar);
+      box-shadow: var(--cam-golge);
     }
 
     .ust {
-      padding: 16px 16px 12px;
-      background: #fff;
-      border-bottom: 1px solid var(--kenar);
-    }
-
-    .baslik-satiri {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
+      position: relative;
+      z-index: 2;
+      margin: 12px 12px 8px;
+      border-radius: var(--radius-lg);
+      padding: 14px;
     }
 
     .baslik h1 {
       margin: 0;
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-size: 1.28rem;
+      font-weight: 800;
       letter-spacing: -0.01em;
     }
 
     .baslik p {
-      margin: 4px 0 0;
-      color: var(--ikincil-metin);
+      margin: 5px 0 0;
+      color: var(--metin-soluk);
       font-size: 0.78rem;
+      font-weight: 500;
     }
 
     .sayaclar {
-      margin-top: 12px;
-      display: flex;
+      margin-top: 11px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
-      flex-wrap: wrap;
     }
 
     .rozet {
-      background: var(--vurgu-soluk);
-      color: var(--vurgu);
-      border: 1px solid #bfdbfe;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 0.7rem;
+      border-radius: 12px;
+      padding: 8px 9px;
+      font-size: 0.72rem;
       font-weight: 700;
+      color: #1f2937;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+    }
+
+    .rozet strong {
+      font-size: 0.9rem;
+      margin-right: 4px;
     }
 
     .duzenleyici {
-      padding: 12px 16px;
-      background: #fff;
-      border-bottom: 1px solid var(--kenar);
+      position: relative;
+      z-index: 2;
+      margin: 0 12px 8px;
+      border-radius: var(--radius-lg);
+      padding: 12px;
       display: grid;
-      gap: 10px;
+      gap: 9px;
     }
 
     .arama {
       width: 100%;
-      border: 1px solid var(--kenar);
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.65);
       padding: 10px 12px;
+      font-size: 0.88rem;
       outline: none;
-      font-size: 0.9rem;
-      background: #fafbff;
+      transition: box-shadow 160ms ease, border-color 160ms ease;
     }
 
     .arama:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px #dbeafe;
+      border-color: rgba(124, 58, 237, 0.42);
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
     }
 
     .filtreler,
@@ -127,52 +195,63 @@
     }
 
     .btn {
-      border: 1px solid var(--kenar);
-      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.62);
       border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      padding: 7px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
       cursor: pointer;
+      transition: transform 140ms ease, background 160ms ease, box-shadow 160ms ease;
     }
 
     .btn:hover {
-      background: #f8faff;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(124, 58, 237, 0.16);
+      background: rgba(255, 255, 255, 0.8);
     }
 
     .btn.aktif {
-      background: var(--vurgu);
+      background: linear-gradient(90deg, rgba(255, 79, 178, 0.84), rgba(124, 58, 237, 0.82));
       color: #fff;
-      border-color: var(--vurgu);
-    }
-
-    .btn.ikonik {
-      background: #eef4ff;
-      border-color: #c7d7ff;
-      color: #163ea3;
+      border-color: transparent;
     }
 
     .btn.tehlike {
-      background: #fff1f2;
-      border-color: #fecdd3;
-      color: #be123c;
+      color: #9f1239;
+      background: rgba(255, 228, 236, 0.82);
+    }
+
+    .btn.mod {
+      color: #1d4ed8;
+      background: rgba(220, 242, 255, 0.82);
+    }
+
+    .surukle-bilgi {
+      margin: 0;
+      font-size: 0.72rem;
+      color: var(--metin-soluk);
+      font-weight: 600;
     }
 
     .icerik {
+      position: relative;
+      z-index: 2;
       flex: 1;
       overflow: auto;
-      padding: 14px 16px 90px;
+      padding: 4px 12px 96px;
       display: grid;
-      gap: 12px;
+      gap: 11px;
     }
 
     .bolum-baslik {
       margin: 0;
-      font-size: 0.83rem;
-      font-weight: 700;
-      color: var(--ikincil-metin);
+      font-size: 0.78rem;
+      color: var(--metin-soluk);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-weight: 800;
+      padding: 0 2px;
     }
 
     .gorev-listesi {
@@ -181,45 +260,108 @@
     }
 
     .gorev-karti {
-      background: var(--kart);
-      border: 1px solid var(--kenar);
-      border-radius: var(--yaricap);
-      padding: 12px;
-      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+      border-radius: var(--radius-md);
+      padding: 11px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+    }
+
+    .gorev-karti::before {
+      content: "";
+      position: absolute;
+      inset: -60% auto auto -40%;
+      width: 140%;
+      height: 140%;
+      background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.32) 40%,
+        rgba(255, 255, 255, 0) 72%
+      );
+      transform: translateX(-58%) rotate(9deg);
+      transition: transform 360ms ease;
+      pointer-events: none;
+    }
+
+    .gorev-karti:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow:
+        0 20px 34px rgba(75, 40, 178, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      border-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .gorev-karti:hover::before {
+      transform: translateX(30%) rotate(9deg);
     }
 
     .gorev-karti.tamamlandi {
-      opacity: 0.85;
+      opacity: 0.84;
     }
 
-    .gorev-karti.ertelendi {
-      background: #fbfcff;
+    .gorev-karti.surukleniyor {
+      opacity: 0.5;
+      transform: scale(0.98);
+      box-shadow: 0 8px 20px rgba(30, 41, 59, 0.17);
     }
+
+    .gorev-karti.birak-once::after,
+    .gorev-karti.birak-sonra::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--ana-1), var(--ana-2), var(--ana-3));
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+      pointer-events: none;
+    }
+
+    .gorev-karti.birak-once::after { top: 3px; }
+    .gorev-karti.birak-sonra::after { bottom: 3px; }
 
     .gorev-ust {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
     }
+
+    .gorev-sol {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .durum-cubugu {
+      width: 6px;
+      min-height: 28px;
+      border-radius: 999px;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+
+    .durum-cubugu.yapilacak { background: linear-gradient(180deg, #94a3b8, #64748b); }
+    .durum-cubugu.acil { background: linear-gradient(180deg, #fb7185, #e11d48); }
+    .durum-cubugu.tamamlandi { background: linear-gradient(180deg, #4ade80, #16a34a); }
+    .durum-cubugu.ertelendi { background: linear-gradient(180deg, #facc15, #f59e0b); }
 
     .gorev-baslik {
       margin: 0;
-      font-size: 0.95rem;
-      font-weight: 700;
-      line-height: 1.35;
+      font-size: 0.94rem;
+      line-height: 1.32;
+      font-weight: 800;
+      word-break: break-word;
     }
 
     .gorev-karti.tamamlandi .gorev-baslik {
       text-decoration: line-through;
-      color: var(--ikincil-metin);
-    }
-
-    .gorev-detay {
-      margin: 7px 0 0;
-      color: var(--ikincil-metin);
-      font-size: 0.78rem;
-      line-height: 1.4;
+      color: #6b7280;
     }
 
     .etiketler {
@@ -227,76 +369,103 @@
       gap: 6px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      flex: 0 0 auto;
     }
 
     .etiket {
-      font-size: 0.68rem;
+      font-size: 0.67rem;
+      font-weight: 800;
       border-radius: 999px;
-      padding: 3px 8px;
-      font-weight: 700;
-      border: 1px solid transparent;
+      padding: 4px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.62);
     }
 
-    .etiket.durum-yapilacak { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
-    .etiket.durum-acil { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
-    .etiket.durum-tamamlandi { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-    .etiket.durum-ertelendi { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-    .etiket.oncelik-yuksek { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
-    .etiket.oncelik-orta { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
-    .etiket.oncelik-dusuk { background: #ecfccb; color: #3f6212; border-color: #d9f99d; }
+    .etiket.durum-yapilacak { color: #334155; }
+    .etiket.durum-acil { color: #be123c; }
+    .etiket.durum-tamamlandi { color: #166534; }
+    .etiket.durum-ertelendi { color: #92400e; }
+    .etiket.oncelik-yuksek { color: #1d4ed8; }
+    .etiket.oncelik-orta { color: #6d28d9; }
+    .etiket.oncelik-dusuk { color: #3f6212; }
+
+    .gorev-detay {
+      position: relative;
+      z-index: 1;
+      margin: 8px 0 0;
+      color: var(--metin-soluk);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
 
     .gorev-alt {
+      position: relative;
+      z-index: 1;
       margin-top: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .surukle-ipucu {
+      font-size: 0.69rem;
+      font-weight: 700;
+      color: #475569;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px dashed rgba(124, 58, 237, 0.28);
+      border-radius: 999px;
+      padding: 3px 8px;
     }
 
     .durum-dugmesi {
       border: 0;
       background: transparent;
-      color: var(--vurgu);
-      padding: 0;
-      font-size: 0.78rem;
-      font-weight: 600;
+      color: #6d28d9;
+      font-size: 0.76rem;
+      font-weight: 700;
       cursor: pointer;
+      padding: 0;
     }
 
     .gorev-aksiyonlar {
       display: flex;
-      flex-wrap: wrap;
       gap: 6px;
+      flex-wrap: wrap;
     }
 
     .gorev-aksiyonlar button {
-      border: 1px solid var(--kenar);
-      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.62);
       border-radius: 8px;
       padding: 5px 8px;
-      font-size: 0.68rem;
+      font-size: 0.66rem;
+      font-weight: 700;
       cursor: pointer;
+      transition: background 140ms ease, transform 140ms ease;
     }
 
     .gorev-aksiyonlar button:hover {
-      background: #f4f8ff;
+      background: rgba(255, 255, 255, 0.84);
+      transform: translateY(-1px);
     }
 
     .bos-durum {
-      background: #fff;
-      border: 1px dashed #c6cedf;
-      border-radius: var(--yaricap);
-      padding: 18px;
-      color: var(--ikincil-metin);
-      font-size: 0.83rem;
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(124, 58, 237, 0.32);
+      padding: 16px;
       text-align: center;
+      font-size: 0.82rem;
+      color: var(--metin-soluk);
+      background: rgba(255, 255, 255, 0.52);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .not-karti {
-      background: #fff;
-      border: 1px solid var(--kenar);
-      border-radius: var(--yaricap);
+      border-radius: var(--radius-lg);
       padding: 12px;
       display: grid;
       gap: 8px;
@@ -304,53 +473,63 @@
 
     .not-karti h2 {
       margin: 0;
-      font-size: 0.86rem;
-      font-weight: 700;
-      color: var(--ikincil-metin);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: #475569;
+      font-weight: 800;
     }
 
     .not-karti textarea {
       width: 100%;
-      min-height: 74px;
+      min-height: 78px;
       resize: vertical;
-      border: 1px solid var(--kenar);
       border-radius: 10px;
-      padding: 9px 10px;
-      background: #fafbff;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.64);
+      padding: 10px;
       font-size: 0.82rem;
       outline: none;
     }
 
+    .not-karti textarea:focus {
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+      border-color: rgba(124, 58, 237, 0.34);
+    }
+
     .alt-fab {
       position: absolute;
-      right: 16px;
-      bottom: 16px;
-      width: 54px;
-      height: 54px;
+      right: 15px;
+      bottom: 14px;
+      width: 58px;
+      height: 58px;
+      border: 0;
       border-radius: 50%;
-      border: none;
-      background: var(--vurgu);
+      background: linear-gradient(130deg, var(--ana-1), var(--vurgu), var(--ana-2));
       color: #fff;
-      font-size: 1.7rem;
+      font-size: 1.9rem;
       cursor: pointer;
-      box-shadow: 0 10px 18px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 16px 30px rgba(99, 40, 222, 0.4);
+      z-index: 3;
+      transition: transform 140ms ease, box-shadow 140ms ease;
     }
 
     .alt-fab:hover {
-      filter: brightness(1.05);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 20px 34px rgba(99, 40, 222, 0.44);
     }
 
     .modal {
       position: absolute;
       inset: 0;
-      background: rgba(17, 24, 39, 0.42);
+      z-index: 12;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
-      z-index: 20;
+      background: rgba(15, 23, 42, 0.34);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     .modal.acik {
@@ -359,12 +538,8 @@
 
     .modal-icerik {
       width: 100%;
-      max-width: 350px;
-      background: #fff;
-      border-radius: 14px;
+      border-radius: var(--radius-lg);
       padding: 14px;
-      border: 1px solid var(--kenar);
-      box-shadow: var(--golge);
       display: grid;
       gap: 8px;
     }
@@ -372,6 +547,7 @@
     .modal-icerik h3 {
       margin: 0 0 2px;
       font-size: 1rem;
+      font-weight: 800;
     }
 
     .alan {
@@ -380,69 +556,91 @@
     }
 
     .alan label {
-      font-size: 0.75rem;
-      color: var(--ikincil-metin);
-      font-weight: 600;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #475569;
     }
 
     .alan input,
     .alan textarea,
     .alan select {
-      border: 1px solid var(--kenar);
       border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.78);
       padding: 9px 10px;
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       outline: none;
-      background: #fff;
     }
 
     .alan textarea {
-      min-height: 74px;
+      min-height: 76px;
       resize: vertical;
     }
 
+    .alan input:focus,
+    .alan textarea:focus,
+    .alan select:focus {
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+      border-color: rgba(124, 58, 237, 0.34);
+    }
+
     .modal-alt {
+      margin-top: 2px;
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      margin-top: 4px;
     }
 
     .modal-alt button {
-      border: 1px solid var(--kenar);
-      background: #fff;
       border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.66);
       padding: 8px 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
+      font-size: 0.76rem;
+      font-weight: 700;
       cursor: pointer;
     }
 
     .modal-alt .kaydet {
-      background: var(--vurgu);
-      border-color: var(--vurgu);
+      background: linear-gradient(100deg, var(--ana-1), var(--vurgu));
+      border-color: transparent;
       color: #fff;
     }
 
-    .tema-yesil {
-      --vurgu: #0f766e;
-      --vurgu-soluk: #ccfbf1;
+    .telefon.tema-neon {
+      --ana-1: #ff2ab8;
+      --ana-2: #00d9ff;
+      --ana-3: #39ff90;
+      --vurgu: #5b21b6;
+      --cam: rgba(255, 255, 255, 0.36);
+    }
+
+    .telefon.tema-lavanta {
+      --ana-1: #fd6edc;
+      --ana-2: #86a8ff;
+      --ana-3: #c2ff9d;
+      --vurgu: #7c3aed;
+      --cam: rgba(255, 255, 255, 0.46);
     }
   </style>
 </head>
 <body>
-  <main class="telefon" aria-label="Görev yönetimi uygulaması">
+  <main class="telefon tema-pomelli" aria-label="Pomelli görev uygulaması">
+    <section class="isiltilar" aria-hidden="true">
+      <span class="isilti bir"></span>
+      <span class="isilti iki"></span>
+      <span class="isilti uc"></span>
+    </section>
+
     <header class="ust">
-      <div class="baslik-satiri">
-        <div class="baslik">
-          <h1>Bugünün Görevleri</h1>
-          <p id="ozetSatiri">Tüm işlerini düzenli bir şekilde yönet.</p>
-        </div>
+      <div class="baslik">
+        <h1>Pomelli Görev Akışı</h1>
+        <p id="ozetSatiri">Günün planını parlak ama düzenli tut.</p>
       </div>
       <div class="sayaclar" id="sayaclar"></div>
     </header>
 
-    <section class="duzenleyici" aria-label="Filtre ve hızlı işlemler">
+    <section class="duzenleyici" aria-label="Filtre ve işlemler">
       <input id="aramaKutusu" class="arama" type="search" placeholder="Görev ara..." />
       <div class="filtreler">
         <button class="btn aktif" type="button" data-filtre="tumu">Tümü</button>
@@ -453,18 +651,19 @@
       </div>
       <div class="hizli-islemler">
         <button id="tamamlananlariSil" class="btn tehlike" type="button">Tamamlananları sil</button>
-        <button id="temaDegistir" class="btn ikonik" type="button">Tema değiştir</button>
-        <button id="tumFiltreyiTemizle" class="btn" type="button">Filtreyi sıfırla</button>
+        <button id="temaDegistir" class="btn mod" type="button">Renk modu</button>
+        <button id="filtreyiSifirla" class="btn" type="button">Filtreyi sıfırla</button>
       </div>
+      <p class="surukle-bilgi">Kartı tutup sürükleyerek sıralamayı değiştir.</p>
     </section>
 
     <section class="icerik">
-      <h2 class="bolum-baslik">Görev Listesi</h2>
+      <h2 class="bolum-baslik">Görevler</h2>
       <div id="gorevListesi" class="gorev-listesi" aria-live="polite"></div>
 
       <section class="not-karti">
         <h2>Notlar</h2>
-        <textarea id="notAlani" placeholder="Kısa notlarını buraya yaz..."></textarea>
+        <textarea id="notAlani" placeholder="Hızlı notunu buraya bırak..."></textarea>
       </section>
     </section>
 
@@ -513,10 +712,11 @@
 
   <script>
     (function () {
-      const GOREVLER_KEY = "duzenliGorevler.v1";
-      const NOT_KEY = "duzenliNotlar.v1";
-      const TEMA_KEY = "duzenliTema.v1";
+      const GOREVLER_KEY = "pomelliGorevler.v2";
+      const NOT_KEY = "pomelliNotlar.v2";
+      const TEMA_KEY = "pomelliTema.v2";
       const GECERLI_FILTRELER = new Set(["tumu", "yapilacak", "acil", "tamamlandi", "ertelendi"]);
+      const TEMALAR = ["pomelli", "neon", "lavanta"];
 
       const durumEtiketi = {
         yapilacak: "Yapılacak",
@@ -531,12 +731,21 @@
         dusuk: "Düşük"
       };
 
+      const temaEtiketi = {
+        pomelli: "Pomelli",
+        neon: "Neon",
+        lavanta: "Lavanta"
+      };
+
       const state = {
         gorevler: [],
         aktifFiltre: "tumu",
         arama: "",
         duzenlenenId: null,
-        tema: "mavi"
+        tema: "pomelli",
+        suruklenenId: null,
+        birakHedefId: null,
+        birakSonra: false
       };
 
       const el = {
@@ -547,7 +756,7 @@
         aramaKutusu: document.getElementById("aramaKutusu"),
         tamamlananlariSil: document.getElementById("tamamlananlariSil"),
         temaDegistir: document.getElementById("temaDegistir"),
-        tumFiltreyiTemizle: document.getElementById("tumFiltreyiTemizle"),
+        filtreyiSifirla: document.getElementById("filtreyiSifirla"),
         notAlani: document.getElementById("notAlani"),
         ekleButonu: document.getElementById("ekleButonu"),
         modal: document.getElementById("modal"),
@@ -565,28 +774,28 @@
           {
             id: idUret(),
             baslik: "Sunum taslağını bitir",
-            detay: "Saat 17:00'ye kadar ilk sürüm hazır olsun.",
+            detay: "Saat 17:00'ye kadar ilk sürüm hazır olmalı.",
             durum: "acil",
             oncelik: "yuksek"
           },
           {
             id: idUret(),
-            baslik: "E-postaları kontrol et",
-            detay: "Yanıt bekleyen kritik mesajları cevapla.",
+            baslik: "Müşteri e-postalarını cevapla",
+            detay: "Bekleyen kritik geri dönüşleri tamamla.",
             durum: "yapilacak",
             oncelik: "orta"
           },
           {
             id: idUret(),
-            baslik: "Fatura gönderimini tamamla",
-            detay: "Muhasebe için PDF çıktısını ilet.",
+            baslik: "Fatura PDF dosyasını gönder",
+            detay: "Muhasebe ile paylaşımı kapat.",
             durum: "tamamlandi",
             oncelik: "orta"
           },
           {
             id: idUret(),
-            baslik: "Dosya arşivini düzenle",
-            detay: "Zaman kalırsa yapılacak.",
+            baslik: "Arşiv klasörünü düzenle",
+            detay: "Yoğunluk azalınca sıraya al.",
             durum: "ertelendi",
             oncelik: "dusuk"
           }
@@ -594,7 +803,7 @@
       }
 
       function idUret() {
-        return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
       }
 
       function metinGuvenli(metin) {
@@ -604,6 +813,18 @@
           .replaceAll(">", "&gt;")
           .replaceAll('"', "&quot;")
           .replaceAll("'", "&#39;");
+      }
+
+      function sonrakiTema() {
+        const mevcutIndex = TEMALAR.indexOf(state.tema);
+        return TEMALAR[(mevcutIndex + 1) % TEMALAR.length];
+      }
+
+      function temaUygula() {
+        el.telefon.classList.remove("tema-pomelli", "tema-neon", "tema-lavanta");
+        el.telefon.classList.add("tema-" + state.tema);
+        const sonraki = sonrakiTema();
+        el.temaDegistir.textContent = "Renk modu: " + temaEtiketi[state.tema] + " → " + temaEtiketi[sonraki];
       }
 
       function yukle() {
@@ -618,11 +839,12 @@
         }
 
         el.notAlani.value = localStorage.getItem(NOT_KEY) || "";
-        state.tema = localStorage.getItem(TEMA_KEY) || "mavi";
-        el.telefon.classList.toggle("tema-yesil", state.tema === "yesil");
+        const tema = localStorage.getItem(TEMA_KEY) || "pomelli";
+        state.tema = TEMALAR.includes(tema) ? tema : "pomelli";
+        temaUygula();
       }
 
-      function kaydetGorevler() {
+      function gorevleriKaydet() {
         localStorage.setItem(GOREVLER_KEY, JSON.stringify(state.gorevler));
       }
 
@@ -639,27 +861,25 @@
         if (!arama) return filtreli;
 
         return filtreli.filter((gorev) => {
-          const metin = (gorev.baslik + " " + gorev.detay).toLocaleLowerCase("tr");
-          return metin.includes(arama);
+          const tamMetin = (gorev.baslik + " " + gorev.detay).toLocaleLowerCase("tr");
+          return tamMetin.includes(arama);
         });
       }
 
       function sayaclariCiz() {
-        const tumu = state.gorevler.length;
+        const toplam = state.gorevler.length;
         const yapilacak = state.gorevler.filter((g) => g.durum === "yapilacak").length;
         const acil = state.gorevler.filter((g) => g.durum === "acil").length;
         const tamamlandi = state.gorevler.filter((g) => g.durum === "tamamlandi").length;
-        const ertelendi = state.gorevler.filter((g) => g.durum === "ertelendi").length;
 
         el.sayaclar.innerHTML = [
-          '<span class="rozet">Toplam: ' + tumu + "</span>",
-          '<span class="rozet">Yapılacak: ' + yapilacak + "</span>",
-          '<span class="rozet">Acil: ' + acil + "</span>",
-          '<span class="rozet">Tamamlandı: ' + tamamlandi + "</span>",
-          '<span class="rozet">Ertelendi: ' + ertelendi + "</span>"
+          '<span class="rozet"><strong>' + toplam + "</strong>Toplam</span>",
+          '<span class="rozet"><strong>' + (yapilacak + acil) + "</strong>Açık</span>",
+          '<span class="rozet"><strong>' + acil + "</strong>Acil</span>",
+          '<span class="rozet"><strong>' + tamamlandi + "</strong>Tamamlandı</span>"
         ].join("");
 
-        el.ozetSatiri.textContent = "Açık görev: " + (yapilacak + acil) + " • Bugün odağını koru.";
+        el.ozetSatiri.textContent = "Açık görev: " + (yapilacak + acil) + " • Renkli ama net bir akıştasın.";
       }
 
       function filtreDugmeleriniCiz() {
@@ -671,15 +891,18 @@
       function gorevKartSinifi(gorev) {
         const siniflar = ["gorev-karti"];
         if (gorev.durum === "tamamlandi") siniflar.push("tamamlandi");
-        if (gorev.durum === "ertelendi") siniflar.push("ertelendi");
         return siniflar.join(" ");
       }
 
       function gorevKartiniCiz(gorev) {
+        const tamamlandiYazi = gorev.durum === "tamamlandi" ? "Yapılacak olarak işaretle" : "Tamamlandı olarak işaretle";
         return (
-          '<article class="' + gorevKartSinifi(gorev) + '" data-id="' + gorev.id + '">' +
+          '<article class="' + gorevKartSinifi(gorev) + '" data-id="' + gorev.id + '" draggable="true">' +
             '<div class="gorev-ust">' +
-              '<h3 class="gorev-baslik">' + metinGuvenli(gorev.baslik) + "</h3>" +
+              '<div class="gorev-sol">' +
+                '<span class="durum-cubugu ' + gorev.durum + '"></span>' +
+                '<h3 class="gorev-baslik">' + metinGuvenli(gorev.baslik) + "</h3>" +
+              "</div>" +
               '<div class="etiketler">' +
                 '<span class="etiket durum-' + gorev.durum + '">' + durumEtiketi[gorev.durum] + "</span>" +
                 '<span class="etiket oncelik-' + gorev.oncelik + '">' + oncelikEtiketi[gorev.oncelik] + "</span>" +
@@ -687,7 +910,8 @@
             "</div>" +
             '<p class="gorev-detay">' + metinGuvenli(gorev.detay || "Detay girilmedi.") + "</p>" +
             '<div class="gorev-alt">' +
-              '<button class="durum-dugmesi" type="button" data-islem="durum-degistir">' + (gorev.durum === "tamamlandi" ? "Yapılacak olarak işaretle" : "Tamamlandı olarak işaretle") + "</button>" +
+              '<span class="surukle-ipucu">↕ sürükle</span>' +
+              '<button class="durum-dugmesi" type="button" data-islem="durum-degistir">' + tamamlandiYazi + "</button>" +
               '<div class="gorev-aksiyonlar">' +
                 '<button type="button" data-islem="acil-yap">Acil yap</button>' +
                 '<button type="button" data-islem="ertele">Ertele</button>' +
@@ -761,7 +985,7 @@
           });
         }
 
-        kaydetGorevler();
+        gorevleriKaydet();
         modalKapat();
         ciz();
       }
@@ -793,19 +1017,19 @@
           gorevSil(gorev.id);
         }
 
-        kaydetGorevler();
+        gorevleriKaydet();
         ciz();
       }
 
       function tamamlananlariTemizle() {
         state.gorevler = state.gorevler.filter((gorev) => gorev.durum !== "tamamlandi");
-        kaydetGorevler();
+        gorevleriKaydet();
         ciz();
       }
 
       function temaDegistir() {
-        state.tema = state.tema === "mavi" ? "yesil" : "mavi";
-        el.telefon.classList.toggle("tema-yesil", state.tema === "yesil");
+        state.tema = sonrakiTema();
+        temaUygula();
         localStorage.setItem(TEMA_KEY, state.tema);
       }
 
@@ -815,11 +1039,105 @@
         ciz();
       }
 
-      function filtreleriSifirla() {
+      function filtreyiSifirla() {
         state.aktifFiltre = "tumu";
         state.arama = "";
         el.aramaKutusu.value = "";
         ciz();
+      }
+
+      function birakIsaretleriniTemizle() {
+        el.gorevListesi.querySelectorAll(".birak-once, .birak-sonra").forEach((kart) => {
+          kart.classList.remove("birak-once", "birak-sonra");
+        });
+      }
+
+      function gorunenSiraIcineTasima(suruklenenId, hedefId, hedefSonra) {
+        const gorunen = gorevleriGetir();
+        const gorunenIds = gorunen.map((g) => g.id);
+        if (!gorunenIds.includes(suruklenenId)) return;
+        if (hedefId && !gorunenIds.includes(hedefId)) return;
+        if (suruklenenId === hedefId) return;
+
+        const suruklenenGorev = state.gorevler.find((g) => g.id === suruklenenId);
+        if (!suruklenenGorev) return;
+
+        const yeniGorunen = gorunen.filter((g) => g.id !== suruklenenId);
+        if (!hedefId) {
+          yeniGorunen.push(suruklenenGorev);
+        } else {
+          const hedefIndex = yeniGorunen.findIndex((g) => g.id === hedefId);
+          if (hedefIndex === -1) {
+            yeniGorunen.push(suruklenenGorev);
+          } else {
+            const eklenecekIndex = hedefIndex + (hedefSonra ? 1 : 0);
+            yeniGorunen.splice(eklenecekIndex, 0, suruklenenGorev);
+          }
+        }
+
+        const gorunenSet = new Set(gorunenIds);
+        let gorunenPointer = 0;
+        state.gorevler = state.gorevler.map((gorev) => {
+          if (!gorunenSet.has(gorev.id)) return gorev;
+          const yeniGorev = yeniGorunen[gorunenPointer];
+          gorunenPointer += 1;
+          return yeniGorev;
+        });
+      }
+
+      function surukleBasladi(event) {
+        const kart = event.target.closest(".gorev-karti");
+        if (!kart) return;
+        state.suruklenenId = kart.dataset.id;
+        state.birakHedefId = null;
+        state.birakSonra = false;
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", state.suruklenenId);
+        setTimeout(function () {
+          kart.classList.add("surukleniyor");
+        }, 0);
+      }
+
+      function suruklemeUzerinde(event) {
+        if (!state.suruklenenId) return;
+        event.preventDefault();
+        const kart = event.target.closest(".gorev-karti");
+        birakIsaretleriniTemizle();
+
+        if (!kart || kart.dataset.id === state.suruklenenId) {
+          state.birakHedefId = null;
+          state.birakSonra = true;
+          return;
+        }
+
+        const dikdortgen = kart.getBoundingClientRect();
+        const sonra = event.clientY > dikdortgen.top + dikdortgen.height / 2;
+        state.birakHedefId = kart.dataset.id;
+        state.birakSonra = sonra;
+        kart.classList.add(sonra ? "birak-sonra" : "birak-once");
+      }
+
+      function birakildi(event) {
+        if (!state.suruklenenId) return;
+        event.preventDefault();
+        gorunenSiraIcineTasima(state.suruklenenId, state.birakHedefId, state.birakSonra);
+        gorevleriKaydet();
+        state.suruklenenId = null;
+        state.birakHedefId = null;
+        state.birakSonra = false;
+        birakIsaretleriniTemizle();
+        ciz();
+      }
+
+      function suruklemeBitti(event) {
+        const kart = event.target.closest(".gorev-karti");
+        if (kart) {
+          kart.classList.remove("surukleniyor");
+        }
+        state.suruklenenId = null;
+        state.birakHedefId = null;
+        state.birakSonra = false;
+        birakIsaretleriniTemizle();
       }
 
       function olaylariBagla() {
@@ -835,6 +1153,11 @@
         });
 
         el.gorevListesi.addEventListener("click", kartIslemleriniYonet);
+        el.gorevListesi.addEventListener("dragstart", surukleBasladi);
+        el.gorevListesi.addEventListener("dragover", suruklemeUzerinde);
+        el.gorevListesi.addEventListener("drop", birakildi);
+        el.gorevListesi.addEventListener("dragend", suruklemeBitti);
+
         el.ekleButonu.addEventListener("click", function () {
           modalAc(null);
         });
@@ -848,7 +1171,7 @@
         el.gorevFormu.addEventListener("submit", gorevKaydet);
         el.tamamlananlariSil.addEventListener("click", tamamlananlariTemizle);
         el.temaDegistir.addEventListener("click", temaDegistir);
-        el.tumFiltreyiTemizle.addEventListener("click", filtreleriSifirla);
+        el.filtreyiSifirla.addEventListener("click", filtreyiSifirla);
 
         el.notAlani.addEventListener("input", function () {
           localStorage.setItem(NOT_KEY, el.notAlani.value);
