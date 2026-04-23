@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brutalist Chaos Task UI</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #000000;
+      --accent: #e8ff00;
+      --shadow: 7px 7px 0 #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #d7d7d7;
+      font-family: "Arial Black", Impact, system-ui, sans-serif;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .phone {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      border: 3px solid var(--ink);
+      background: var(--bg);
+      box-shadow: 10px 10px 0 var(--ink);
+      overflow: hidden;
+    }
+
+    .today-banner {
+      position: absolute;
+      top: 18px;
+      left: 14px;
+      transform: rotate(-4deg);
+      background: var(--accent);
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      padding: 8px 14px;
+      text-transform: uppercase;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: 0.05em;
+      z-index: 40;
+    }
+
+    .today-banner .mono {
+      display: block;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.7rem;
+      margin-top: 5px;
+      transform: rotate(2deg);
+    }
+
+    .sticky-fragment {
+      position: absolute;
+      top: 22px;
+      right: -4px;
+      width: 128px;
+      min-height: 74px;
+      padding: 9px 10px;
+      border: 3px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--ink);
+      background: #fff;
+      transform: rotate(11deg);
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-size: 0.95rem;
+      z-index: 18;
+    }
+
+    .task-card {
+      position: absolute;
+      background: #fff;
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+      line-height: 1.25;
+      z-index: 10;
+    }
+
+    .task-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .task-card p {
+      margin: 6px 0 0;
+      font-size: 0.77rem;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+    }
+
+    .urgent {
+      top: 120px;
+      left: 8px;
+      width: 320px;
+      min-height: 172px;
+      transform: rotate(-6deg);
+      background: var(--accent);
+      z-index: 30;
+    }
+
+    .urgent h3 {
+      font-size: 1.3rem;
+    }
+
+    .done {
+      top: 276px;
+      left: 58px;
+      width: 262px;
+      min-height: 122px;
+      transform: rotate(5deg);
+      background: #fff;
+      z-index: 20;
+    }
+
+    .done h3 {
+      text-decoration: line-through;
+      text-decoration-thickness: 3px;
+    }
+
+    .ignored {
+      top: 339px;
+      left: -18px;
+      width: 184px;
+      min-height: 104px;
+      transform: rotate(-10deg);
+      opacity: 0.65;
+      z-index: 9;
+    }
+
+    .tiny {
+      top: 438px;
+      right: 16px;
+      width: 134px;
+      min-height: 78px;
+      transform: rotate(13deg);
+      font-size: 0.74rem;
+      opacity: 0.6;
+      z-index: 8;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+    }
+
+    .checkbox-square {
+      width: 18px;
+      height: 18px;
+      border: 3px solid var(--ink);
+      background: #fff;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .checkbox-square.checked::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: -2px;
+      width: 7px;
+      height: 13px;
+      border: solid var(--ink);
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+
+    .checkbox-hand {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--ink);
+      border-radius: 43% 57% 51% 49% / 38% 53% 47% 62%;
+      transform: rotate(-8deg);
+      background: #fff;
+      flex: 0 0 auto;
+    }
+
+    .checkbox-hand.checked::after {
+      content: "x";
+      position: absolute;
+      left: 3px;
+      top: -3px;
+      font-size: 1.15rem;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-weight: 900;
+    }
+
+    .scribble {
+      position: absolute;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-size: 1.15rem;
+      font-weight: 900;
+      transform-origin: center;
+      z-index: 45;
+    }
+
+    .scribble.s1 { top: 228px; right: 22px; transform: rotate(-14deg); }
+    .scribble.s2 { top: 320px; left: 14px; transform: rotate(13deg); }
+    .scribble.s3 { top: 506px; left: 236px; transform: rotate(-22deg); }
+
+    .dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--ink);
+      border-radius: 50%;
+      z-index: 44;
+    }
+
+    .dot.d1 { top: 109px; left: 78px; }
+    .dot.d2 { top: 180px; left: 348px; }
+    .dot.d3 { top: 262px; right: 18px; }
+    .dot.d4 { top: 532px; left: 34px; }
+    .dot.d5 { top: 608px; left: 171px; }
+
+    .arrow {
+      position: absolute;
+      font-size: 1.55rem;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 900;
+      z-index: 46;
+    }
+
+    .arrow.a1 { top: 88px; right: 116px; transform: rotate(19deg); }
+    .arrow.a2 { top: 398px; left: 130px; transform: rotate(-27deg); }
+
+    .crossed {
+      position: absolute;
+      top: 522px;
+      left: 24px;
+      transform: rotate(-5deg);
+      font-size: 0.9rem;
+      z-index: 22;
+      font-family: "Courier New", Courier, monospace;
+      text-decoration: line-through;
+      text-decoration-thickness: 3px;
+    }
+
+    .fragment-list {
+      position: absolute;
+      top: 586px;
+      left: -28px;
+      width: 438px;
+      min-height: 294px;
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      background: #fff;
+      transform: rotate(-3deg);
+      padding: 14px 18px 20px;
+      z-index: 13;
+    }
+
+    .fragment-list h4 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: inline-block;
+      background: var(--accent);
+      border: 3px solid var(--ink);
+      padding: 3px 9px;
+      transform: rotate(2deg);
+    }
+
+    .fragment-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 10px;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .fragment-item.ignored {
+      position: static;
+      width: auto;
+      min-height: auto;
+      transform: rotate(0deg);
+      border: none;
+      box-shadow: none;
+      opacity: 0.5;
+      padding: 0;
+      background: transparent;
+      margin-top: 8px;
+    }
+
+    .fab {
+      position: absolute;
+      right: -8px;
+      top: 517px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid var(--ink);
+      background: var(--accent);
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      font-size: 2.5rem;
+      line-height: 1;
+      transform: rotate(13deg);
+      z-index: 51;
+    }
+
+    .note-rough {
+      position: absolute;
+      left: 206px;
+      top: 474px;
+      width: 162px;
+      min-height: 86px;
+      padding: 8px 10px;
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      transform: rotate(-8deg);
+      background: #fff;
+      font-family: "Comic Sans MS", "Segoe Print", cursive;
+      font-size: 1rem;
+      z-index: 25;
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="Chaotic task management interface">
+    <section class="today-banner">
+      TODAY
+      <span class="mono">9 TASKS // 3 CHAOS LEVEL</span>
+    </section>
+
+    <aside class="sticky-fragment">
+      stop pretending this is organized
+    </aside>
+
+    <article class="task-card urgent">
+      <h3>URGENT: Submit bugfix before 11:00</h3>
+      <p>Owner: Me // status: loud panic</p>
+      <div class="checkbox-row">
+        <span class="checkbox-square"></span>
+        <span>push branch + tag release notes</span>
+      </div>
+      <div class="checkbox-row">
+        <span class="checkbox-hand checked"></span>
+        <span>coffee x2</span>
+      </div>
+    </article>
+
+    <article class="task-card done">
+      <h3>Done: sent invoice draft</h3>
+      <p>archived but still haunting</p>
+      <div class="checkbox-row">
+        <span class="checkbox-square checked"></span>
+        <span>marked complete at 08:04</span>
+      </div>
+    </article>
+
+    <article class="task-card ignored">
+      <h3>Ignored: clean downloads folder</h3>
+      <p>maybe next lifetime</p>
+    </article>
+
+    <article class="task-card tiny">
+      <h3>low: water plant</h3>
+      <p>dry but patient</p>
+    </article>
+
+    <aside class="note-rough">
+      call mom<br />
+      write docs<br />
+      definitely sleep
+    </aside>
+
+    <p class="crossed">crossed out: "be normal"</p>
+
+    <section class="fragment-list">
+      <h4>Fragmented list</h4>
+      <div class="fragment-item">
+        <span class="checkbox-hand"></span>
+        <span>reply to 17 unread messages</span>
+      </div>
+      <div class="fragment-item">
+        <span class="checkbox-square checked"></span>
+        <span>break production (accidentally)</span>
+      </div>
+      <div class="fragment-item ignored">
+        <span class="checkbox-square"></span>
+        <span>organize desk cables</span>
+      </div>
+      <div class="fragment-item">
+        <span class="checkbox-hand checked"></span>
+        <span>draft "chaos is a process" manifesto</span>
+      </div>
+    </section>
+
+    <button class="fab" aria-label="Add task">+</button>
+
+    <span class="scribble s1">!!!</span>
+    <span class="scribble s2">nope</span>
+    <span class="scribble s3">rush</span>
+    <span class="arrow a1">↯</span>
+    <span class="arrow a2">↘</span>
+    <span class="dot d1"></span>
+    <span class="dot d2"></span>
+    <span class="dot d3"></span>
+    <span class="dot d4"></span>
+    <span class="dot d5"></span>
+  </main>
+</body>
+</html>
