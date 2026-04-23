@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chaos Tasks - fully interactive</title>
+  <title>Görev Takibi - Mobil Uygulama</title>
   <style>
     :root {
-      --bg: #ffffff;
-      --ink: #000000;
-      --accent: #e8ff00;
-      --shadow: 7px 7px 0 #000000;
-      --danger: #ff0000;
+      --arka-plan: #f3f5f9;
+      --kart: #ffffff;
+      --metin: #1a1d26;
+      --ikincil-metin: #5a6273;
+      --kenar: #d9deea;
+      --vurgu: #2563eb;
+      --vurgu-soluk: #dbeafe;
+      --hata: #dc2626;
+      --golge: 0 10px 24px rgba(17, 24, 39, 0.12);
+      --yaricap: 14px;
     }
 
     * {
@@ -22,10 +27,9 @@
       min-height: 100vh;
       display: grid;
       place-items: center;
-      background: #cfcfcf;
-      font-family: "Arial Black", Impact, system-ui, sans-serif;
-      color: var(--ink);
-      overflow: hidden;
+      background: linear-gradient(180deg, #e8edf7 0%, #f7f8fc 100%);
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--metin);
     }
 
     button,
@@ -36,687 +40,565 @@
       color: inherit;
     }
 
-    .phone {
-      position: relative;
+    .telefon {
       width: 390px;
       height: 844px;
-      border: 3px solid var(--ink);
-      box-shadow: 10px 10px 0 var(--ink);
-      background: var(--bg);
+      background: var(--arka-plan);
+      border: 1px solid #cfd6e6;
+      border-radius: 18px;
+      box-shadow: var(--golge);
       overflow: hidden;
-      isolation: isolate;
-    }
-
-    .today-banner {
-      position: absolute;
-      top: 16px;
-      left: 12px;
-      transform: rotate(-4deg);
-      border: 3px solid var(--ink);
-      background: var(--accent);
-      box-shadow: var(--shadow);
-      padding: 8px 12px;
-      z-index: 45;
-      min-width: 224px;
-    }
-
-    .today-banner h1 {
-      margin: 0;
-      letter-spacing: 0.08em;
-      line-height: 1;
-      font-size: 1.85rem;
-      text-transform: uppercase;
-    }
-
-    .today-meta {
-      margin-top: 4px;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.71rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .panel-controls {
-      position: absolute;
-      top: 108px;
-      left: 8px;
-      width: 372px;
+      position: relative;
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      transform: rotate(1deg);
-      z-index: 42;
+      flex-direction: column;
     }
 
-    .ctrl-btn {
-      border: 3px solid var(--ink);
-      box-shadow: 4px 4px 0 var(--ink);
+    .ust {
+      padding: 16px 16px 12px;
       background: #fff;
-      padding: 4px 8px;
-      text-transform: uppercase;
-      font-size: 0.64rem;
-      letter-spacing: 0.05em;
-      cursor: pointer;
+      border-bottom: 1px solid var(--kenar);
     }
 
-    .ctrl-btn.active {
-      background: var(--accent);
-    }
-
-    .sticky-fragment {
-      position: absolute;
-      top: 22px;
-      right: -4px;
-      width: 134px;
-      border: 3px solid var(--ink);
-      box-shadow: 6px 6px 0 var(--ink);
-      padding: 8px 9px;
-      background: #fff;
-      transform: rotate(9deg);
-      z-index: 30;
-    }
-
-    .sticky-fragment textarea {
-      width: 100%;
-      min-height: 62px;
-      resize: none;
-      border: 0;
-      background: transparent;
-      font-family: "Comic Sans MS", "Segoe Print", cursive;
-      font-size: 0.9rem;
-      font-weight: 700;
-      outline: none;
-    }
-
-    .sticky-actions {
-      display: flex;
-      gap: 4px;
-      margin-top: 3px;
-    }
-
-    .sticky-actions button {
-      flex: 1;
-      border: 2px solid var(--ink);
-      background: var(--accent);
-      font-size: 0.54rem;
-      text-transform: uppercase;
-      cursor: pointer;
-      padding: 2px;
-    }
-
-    .board {
-      position: absolute;
-      top: 150px;
-      left: 0;
-      width: 100%;
-      height: 420px;
-      z-index: 20;
-    }
-
-    .task-card {
-      position: absolute;
-      border: 3px solid var(--ink);
-      background: #fff;
-      box-shadow: var(--shadow);
-      padding: 10px 10px 8px;
-      overflow: hidden;
-      cursor: default;
-    }
-
-    .task-card.urgent {
-      background: var(--accent);
-      width: 316px;
-      min-height: 152px;
-      z-index: 40;
-    }
-
-    .task-card.done {
-      width: 252px;
-      min-height: 126px;
-      z-index: 33;
-    }
-
-    .task-card.ignored {
-      width: 174px;
-      min-height: 94px;
-      opacity: 0.63;
-      z-index: 17;
-    }
-
-    .task-card.low {
-      width: 138px;
-      min-height: 88px;
-      opacity: 0.65;
-      z-index: 16;
-    }
-
-    .task-header {
+    .baslik-satiri {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 6px;
+      gap: 10px;
     }
 
-    .task-card h3 {
+    .baslik h1 {
       margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.15;
-      text-transform: uppercase;
-      max-width: 78%;
-    }
-
-    .task-card.done h3 {
-      text-decoration: line-through;
-      text-decoration-thickness: 3px;
-    }
-
-    .task-desc {
-      margin: 7px 0 0;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.74rem;
+      font-size: 1.3rem;
       font-weight: 700;
-      line-height: 1.25;
+      letter-spacing: -0.01em;
     }
 
-    .chip-wrap {
-      display: grid;
-      gap: 3px;
-      text-align: right;
+    .baslik p {
+      margin: 4px 0 0;
+      color: var(--ikincil-metin);
+      font-size: 0.78rem;
     }
 
-    .chip {
-      border: 2px solid var(--ink);
-      font-size: 0.55rem;
-      padding: 1px 4px;
-      background: #fff;
-      font-family: "Courier New", Courier, monospace;
-      text-transform: uppercase;
-    }
-
-    .checkbox-row {
-      margin-top: 8px;
+    .sayaclar {
+      margin-top: 12px;
       display: flex;
-      align-items: center;
       gap: 8px;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.74rem;
-      font-weight: 700;
-    }
-
-    .checkbox-btn {
-      border: none;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-      flex: 0 0 auto;
-    }
-
-    .checkbox-box,
-    .checkbox-hand {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid var(--ink);
-      background: #fff;
-      position: relative;
-    }
-
-    .checkbox-hand {
-      border-radius: 47% 53% 45% 55% / 40% 52% 48% 60%;
-      transform: rotate(-7deg);
-    }
-
-    .checkbox-box.checked::after {
-      content: "";
-      position: absolute;
-      left: 3px;
-      top: -2px;
-      width: 7px;
-      height: 13px;
-      border: solid var(--ink);
-      border-width: 0 3px 3px 0;
-      transform: rotate(45deg);
-    }
-
-    .checkbox-hand.checked::after {
-      content: "x";
-      position: absolute;
-      left: 4px;
-      top: -3px;
-      font-family: "Comic Sans MS", "Segoe Print", cursive;
-      font-size: 1.12rem;
-      font-weight: 900;
-    }
-
-    .task-actions {
-      margin-top: 8px;
-      display: flex;
       flex-wrap: wrap;
-      gap: 5px;
     }
 
-    .task-actions button {
-      border: 2px solid var(--ink);
-      background: #fff;
-      padding: 1px 4px;
-      font-size: 0.56rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-
-    .task-actions button:hover {
-      background: var(--accent);
-    }
-
-    .fragment-list {
-      position: absolute;
-      top: 572px;
-      left: -28px;
-      width: 440px;
-      min-height: 294px;
-      border: 3px solid var(--ink);
-      box-shadow: var(--shadow);
-      background: #fff;
-      transform: rotate(-3deg);
-      padding: 13px 16px 20px;
-      z-index: 21;
-      overflow: hidden;
-    }
-
-    .fragment-list h2 {
-      margin: 0;
-      display: inline-block;
-      border: 3px solid var(--ink);
-      box-shadow: 4px 4px 0 var(--ink);
-      background: var(--accent);
-      transform: rotate(2deg);
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 3px 7px;
-    }
-
-    .fragment-list p {
-      margin: 6px 0 0;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.68rem;
-      font-weight: 700;
-    }
-
-    .fragment-items {
-      margin-top: 9px;
-      display: grid;
-      gap: 8px;
-      max-height: 215px;
-      overflow: auto;
-      padding-right: 10px;
-    }
-
-    .fragment-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 6px;
-      align-items: center;
-      border: 2px solid var(--ink);
-      padding: 6px;
-      font-family: "Courier New", Courier, monospace;
-      font-weight: 700;
-      font-size: 0.73rem;
-    }
-
-    .fragment-item.ignored {
-      opacity: 0.55;
-      transform: rotate(-1deg);
-    }
-
-    .mini-actions {
-      display: flex;
-      gap: 5px;
-    }
-
-    .mini-actions button {
-      border: 2px solid var(--ink);
-      background: #fff;
-      font-size: 0.53rem;
-      text-transform: uppercase;
-      cursor: pointer;
-      padding: 1px 4px;
-    }
-
-    .fab {
-      position: absolute;
-      right: -8px;
-      top: 504px;
-      width: 74px;
-      height: 74px;
-      border-radius: 50%;
-      border: 3px solid var(--ink);
-      box-shadow: var(--shadow);
-      background: var(--accent);
-      font-size: 2.5rem;
-      line-height: 1;
-      cursor: pointer;
-      transform: rotate(12deg);
-      z-index: 60;
-    }
-
-    .crossed {
-      position: absolute;
-      left: 16px;
-      top: 538px;
-      margin: 0;
-      transform: rotate(-6deg);
-      text-decoration: line-through;
-      text-decoration-thickness: 3px;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.88rem;
-      z-index: 35;
-    }
-
-    .decor {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 48;
-    }
-
-    .scribble {
-      position: absolute;
-      font-family: "Comic Sans MS", "Segoe Print", cursive;
-      font-size: 1.2rem;
-      font-weight: 900;
-    }
-
-    .dot {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: var(--ink);
-      border-radius: 50%;
-    }
-
-    .composer {
-      position: absolute;
-      left: 24px;
-      right: 24px;
-      top: 210px;
-      border: 3px solid var(--ink);
-      box-shadow: 8px 8px 0 var(--ink);
-      background: #fff;
-      z-index: 78;
-      padding: 10px;
-      transform: rotate(-2deg);
-      display: none;
-    }
-
-    .composer.open {
-      display: block;
-    }
-
-    .composer h3 {
-      margin: 0 0 8px;
-      text-transform: uppercase;
-      background: var(--accent);
-      border: 3px solid var(--ink);
-      display: inline-block;
-      padding: 2px 8px;
-      font-size: 0.96rem;
-    }
-
-    .composer label {
-      display: block;
-      margin-top: 6px;
-      font-family: "Courier New", Courier, monospace;
+    .rozet {
+      background: var(--vurgu-soluk);
+      color: var(--vurgu);
+      border: 1px solid #bfdbfe;
+      padding: 4px 8px;
+      border-radius: 999px;
       font-size: 0.7rem;
       font-weight: 700;
-      text-transform: uppercase;
     }
 
-    .composer input,
-    .composer textarea,
-    .composer select {
-      width: 100%;
-      border: 3px solid var(--ink);
+    .duzenleyici {
+      padding: 12px 16px;
       background: #fff;
-      box-shadow: 3px 3px 0 var(--ink);
-      padding: 5px;
-      margin-top: 2px;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.76rem;
+      border-bottom: 1px solid var(--kenar);
+      display: grid;
+      gap: 10px;
+    }
+
+    .arama {
+      width: 100%;
+      border: 1px solid var(--kenar);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+      font-size: 0.9rem;
+      background: #fafbff;
+    }
+
+    .arama:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px #dbeafe;
+    }
+
+    .filtreler,
+    .hizli-islemler {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--kenar);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #f8faff;
+    }
+
+    .btn.aktif {
+      background: var(--vurgu);
+      color: #fff;
+      border-color: var(--vurgu);
+    }
+
+    .btn.ikonik {
+      background: #eef4ff;
+      border-color: #c7d7ff;
+      color: #163ea3;
+    }
+
+    .btn.tehlike {
+      background: #fff1f2;
+      border-color: #fecdd3;
+      color: #be123c;
+    }
+
+    .icerik {
+      flex: 1;
+      overflow: auto;
+      padding: 14px 16px 90px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .bolum-baslik {
+      margin: 0;
+      font-size: 0.83rem;
       font-weight: 700;
+      color: var(--ikincil-metin);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .gorev-listesi {
+      display: grid;
+      gap: 10px;
+    }
+
+    .gorev-karti {
+      background: var(--kart);
+      border: 1px solid var(--kenar);
+      border-radius: var(--yaricap);
+      padding: 12px;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .gorev-karti.tamamlandi {
+      opacity: 0.85;
+    }
+
+    .gorev-karti.ertelendi {
+      background: #fbfcff;
+    }
+
+    .gorev-ust {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .gorev-baslik {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .gorev-karti.tamamlandi .gorev-baslik {
+      text-decoration: line-through;
+      color: var(--ikincil-metin);
+    }
+
+    .gorev-detay {
+      margin: 7px 0 0;
+      color: var(--ikincil-metin);
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .etiketler {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .etiket {
+      font-size: 0.68rem;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .etiket.durum-yapilacak { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+    .etiket.durum-acil { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+    .etiket.durum-tamamlandi { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .etiket.durum-ertelendi { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .etiket.oncelik-yuksek { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+    .etiket.oncelik-orta { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    .etiket.oncelik-dusuk { background: #ecfccb; color: #3f6212; border-color: #d9f99d; }
+
+    .gorev-alt {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .durum-dugmesi {
+      border: 0;
+      background: transparent;
+      color: var(--vurgu);
+      padding: 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .gorev-aksiyonlar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .gorev-aksiyonlar button {
+      border: 1px solid var(--kenar);
+      background: #fff;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 0.68rem;
+      cursor: pointer;
+    }
+
+    .gorev-aksiyonlar button:hover {
+      background: #f4f8ff;
+    }
+
+    .bos-durum {
+      background: #fff;
+      border: 1px dashed #c6cedf;
+      border-radius: var(--yaricap);
+      padding: 18px;
+      color: var(--ikincil-metin);
+      font-size: 0.83rem;
+      text-align: center;
+    }
+
+    .not-karti {
+      background: #fff;
+      border: 1px solid var(--kenar);
+      border-radius: var(--yaricap);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .not-karti h2 {
+      margin: 0;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--ikincil-metin);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .not-karti textarea {
+      width: 100%;
+      min-height: 74px;
+      resize: vertical;
+      border: 1px solid var(--kenar);
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: #fafbff;
+      font-size: 0.82rem;
       outline: none;
     }
 
-    .composer textarea {
-      min-height: 62px;
-      resize: none;
+    .alt-fab {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: none;
+      background: var(--vurgu);
+      color: #fff;
+      font-size: 1.7rem;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(37, 99, 235, 0.35);
     }
 
-    .composer-actions {
-      margin-top: 9px;
+    .alt-fab:hover {
+      filter: brightness(1.05);
+    }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 20;
+    }
+
+    .modal.acik {
+      display: flex;
+    }
+
+    .modal-icerik {
+      width: 100%;
+      max-width: 350px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--kenar);
+      box-shadow: var(--golge);
+      display: grid;
+      gap: 8px;
+    }
+
+    .modal-icerik h3 {
+      margin: 0 0 2px;
+      font-size: 1rem;
+    }
+
+    .alan {
+      display: grid;
+      gap: 4px;
+    }
+
+    .alan label {
+      font-size: 0.75rem;
+      color: var(--ikincil-metin);
+      font-weight: 600;
+    }
+
+    .alan input,
+    .alan textarea,
+    .alan select {
+      border: 1px solid var(--kenar);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 0.86rem;
+      outline: none;
+      background: #fff;
+    }
+
+    .alan textarea {
+      min-height: 74px;
+      resize: vertical;
+    }
+
+    .modal-alt {
       display: flex;
       justify-content: flex-end;
-      gap: 7px;
+      gap: 8px;
+      margin-top: 4px;
     }
 
-    .composer-actions button {
-      border: 3px solid var(--ink);
-      box-shadow: 4px 4px 0 var(--ink);
+    .modal-alt button {
+      border: 1px solid var(--kenar);
       background: #fff;
-      text-transform: uppercase;
-      font-size: 0.66rem;
-      padding: 3px 9px;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
       cursor: pointer;
     }
 
-    .composer-actions .save-btn {
-      background: var(--accent);
+    .modal-alt .kaydet {
+      background: var(--vurgu);
+      border-color: var(--vurgu);
+      color: #fff;
     }
 
-    .accent-red {
-      --accent: var(--danger);
+    .tema-yesil {
+      --vurgu: #0f766e;
+      --vurgu-soluk: #ccfbf1;
     }
   </style>
 </head>
 <body>
-  <main class="phone" aria-label="Chaos task app">
-    <section class="today-banner">
-      <h1>Today</h1>
-      <div id="todayMeta" class="today-meta"></div>
-    </section>
-
-    <aside class="sticky-fragment">
-      <textarea id="scratchpad" aria-label="Scribble note"></textarea>
-      <div class="sticky-actions">
-        <button id="saveScratch" type="button">save</button>
-        <button id="strikeScratch" type="button">strike</button>
+  <main class="telefon" aria-label="Görev yönetimi uygulaması">
+    <header class="ust">
+      <div class="baslik-satiri">
+        <div class="baslik">
+          <h1>Bugünün Görevleri</h1>
+          <p id="ozetSatiri">Tüm işlerini düzenli bir şekilde yönet.</p>
+        </div>
       </div>
-    </aside>
+      <div class="sayaclar" id="sayaclar"></div>
+    </header>
 
-    <section class="panel-controls" aria-label="Task controls">
-      <button class="ctrl-btn active" type="button" data-filter="all">all</button>
-      <button class="ctrl-btn" type="button" data-filter="urgent">urgent</button>
-      <button class="ctrl-btn" type="button" data-filter="done">done</button>
-      <button class="ctrl-btn" type="button" data-filter="ignored">ignored</button>
-      <button class="ctrl-btn" type="button" id="shuffleBtn">shuffle chaos</button>
-      <button class="ctrl-btn" type="button" id="clearDoneBtn">wipe done</button>
-      <button class="ctrl-btn" type="button" id="accentBtn">swap accent</button>
-    </section>
-
-    <section id="board" class="board" aria-live="polite"></section>
-
-    <p class="crossed">crossed out: be normal</p>
-
-    <section class="fragment-list">
-      <h2>Fragmented list</h2>
-      <p>broken tasks below the fold, still alive</p>
-      <div id="fragmentItems" class="fragment-items"></div>
-    </section>
-
-    <button class="fab" id="addTaskBtn" type="button" aria-label="Add task">+</button>
-
-    <section class="decor" aria-hidden="true">
-      <span id="scribble1" class="scribble" style="top: 228px; right: 21px; transform: rotate(-15deg);">!!!</span>
-      <span id="scribble2" class="scribble" style="top: 316px; left: 13px; transform: rotate(12deg);">rush</span>
-      <span id="scribble3" class="scribble" style="top: 502px; left: 234px; transform: rotate(-19deg);">nope</span>
-      <span class="dot" style="top: 112px; left: 72px;"></span>
-      <span class="dot" style="top: 180px; left: 349px;"></span>
-      <span class="dot" style="top: 262px; right: 18px;"></span>
-      <span class="dot" style="top: 532px; left: 35px;"></span>
-      <span class="dot" style="top: 606px; left: 173px;"></span>
-    </section>
-
-    <section id="composer" class="composer" aria-label="Task composer">
-      <h3 id="composerTitle">Add task</h3>
-      <label for="taskTitle">Task title</label>
-      <input id="taskTitle" maxlength="64" />
-      <label for="taskDetail">Detail</label>
-      <textarea id="taskDetail" maxlength="120"></textarea>
-      <label for="taskPriority">Priority</label>
-      <select id="taskPriority">
-        <option value="high">high</option>
-        <option value="medium">medium</option>
-        <option value="low">low</option>
-      </select>
-      <label for="taskState">State</label>
-      <select id="taskState">
-        <option value="todo">todo</option>
-        <option value="urgent">urgent</option>
-        <option value="done">done</option>
-        <option value="ignored">ignored</option>
-      </select>
-      <div class="composer-actions">
-        <button id="cancelTaskBtn" type="button">cancel</button>
-        <button id="saveTaskBtn" class="save-btn" type="button">save</button>
+    <section class="duzenleyici" aria-label="Filtre ve hızlı işlemler">
+      <input id="aramaKutusu" class="arama" type="search" placeholder="Görev ara..." />
+      <div class="filtreler">
+        <button class="btn aktif" type="button" data-filtre="tumu">Tümü</button>
+        <button class="btn" type="button" data-filtre="yapilacak">Yapılacak</button>
+        <button class="btn" type="button" data-filtre="acil">Acil</button>
+        <button class="btn" type="button" data-filtre="tamamlandi">Tamamlandı</button>
+        <button class="btn" type="button" data-filtre="ertelendi">Ertelendi</button>
       </div>
+      <div class="hizli-islemler">
+        <button id="tamamlananlariSil" class="btn tehlike" type="button">Tamamlananları sil</button>
+        <button id="temaDegistir" class="btn ikonik" type="button">Tema değiştir</button>
+        <button id="tumFiltreyiTemizle" class="btn" type="button">Filtreyi sıfırla</button>
+      </div>
+    </section>
+
+    <section class="icerik">
+      <h2 class="bolum-baslik">Görev Listesi</h2>
+      <div id="gorevListesi" class="gorev-listesi" aria-live="polite"></div>
+
+      <section class="not-karti">
+        <h2>Notlar</h2>
+        <textarea id="notAlani" placeholder="Kısa notlarını buraya yaz..."></textarea>
+      </section>
+    </section>
+
+    <button id="ekleButonu" class="alt-fab" type="button" aria-label="Yeni görev ekle">+</button>
+
+    <section id="modal" class="modal" aria-label="Görev formu">
+      <form id="gorevFormu" class="modal-icerik">
+        <h3 id="modalBaslik">Yeni görev ekle</h3>
+
+        <div class="alan">
+          <label for="gorevBaslik">Başlık</label>
+          <input id="gorevBaslik" maxlength="80" required />
+        </div>
+
+        <div class="alan">
+          <label for="gorevDetay">Detay</label>
+          <textarea id="gorevDetay" maxlength="220"></textarea>
+        </div>
+
+        <div class="alan">
+          <label for="gorevOncelik">Öncelik</label>
+          <select id="gorevOncelik">
+            <option value="yuksek">Yüksek</option>
+            <option value="orta">Orta</option>
+            <option value="dusuk">Düşük</option>
+          </select>
+        </div>
+
+        <div class="alan">
+          <label for="gorevDurum">Durum</label>
+          <select id="gorevDurum">
+            <option value="yapilacak">Yapılacak</option>
+            <option value="acil">Acil</option>
+            <option value="tamamlandi">Tamamlandı</option>
+            <option value="ertelendi">Ertelendi</option>
+          </select>
+        </div>
+
+        <div class="modal-alt">
+          <button id="iptalButonu" type="button">İptal</button>
+          <button class="kaydet" type="submit">Kaydet</button>
+        </div>
+      </form>
     </section>
   </main>
 
   <script>
     (function () {
-      const TASKS_KEY = "chaosTasks.v2";
-      const SCRATCH_KEY = "chaosScratch.v2";
-      const ACCENT_KEY = "chaosAccent.v2";
-      const FILTERS = new Set(["all", "urgent", "done", "ignored"]);
-      const LAYOUTS = [
-        { top: 6, left: 8, rotate: -7 },
-        { top: 128, left: 56, rotate: 5 },
-        { top: 197, left: -18, rotate: -11 },
-        { top: 258, left: 198, rotate: 10 },
-        { top: 48, left: 204, rotate: -5 },
-        { top: 238, left: 88, rotate: -3 },
-        { top: 302, left: 8, rotate: 8 }
-      ];
-      const SCRIBBLES = ["rush", "nah", "panic", "ship it", "chaos", "later", "oops"];
+      const GOREVLER_KEY = "duzenliGorevler.v1";
+      const NOT_KEY = "duzenliNotlar.v1";
+      const TEMA_KEY = "duzenliTema.v1";
+      const GECERLI_FILTRELER = new Set(["tumu", "yapilacak", "acil", "tamamlandi", "ertelendi"]);
+
+      const durumEtiketi = {
+        yapilacak: "Yapılacak",
+        acil: "Acil",
+        tamamlandi: "Tamamlandı",
+        ertelendi: "Ertelendi"
+      };
+
+      const oncelikEtiketi = {
+        yuksek: "Yüksek",
+        orta: "Orta",
+        dusuk: "Düşük"
+      };
 
       const state = {
-        tasks: [],
-        filter: "all",
-        editingId: null,
-        chaosShift: 0,
-        accent: "yellow",
-        scratchedOut: false
+        gorevler: [],
+        aktifFiltre: "tumu",
+        arama: "",
+        duzenlenenId: null,
+        tema: "mavi"
       };
 
-      const nodes = {
-        phone: document.querySelector(".phone"),
-        board: document.getElementById("board"),
-        todayMeta: document.getElementById("todayMeta"),
-        fragmentItems: document.getElementById("fragmentItems"),
-        addTaskBtn: document.getElementById("addTaskBtn"),
-        composer: document.getElementById("composer"),
-        composerTitle: document.getElementById("composerTitle"),
-        taskTitle: document.getElementById("taskTitle"),
-        taskDetail: document.getElementById("taskDetail"),
-        taskPriority: document.getElementById("taskPriority"),
-        taskState: document.getElementById("taskState"),
-        cancelTaskBtn: document.getElementById("cancelTaskBtn"),
-        saveTaskBtn: document.getElementById("saveTaskBtn"),
-        shuffleBtn: document.getElementById("shuffleBtn"),
-        clearDoneBtn: document.getElementById("clearDoneBtn"),
-        accentBtn: document.getElementById("accentBtn"),
-        scratchpad: document.getElementById("scratchpad"),
-        saveScratch: document.getElementById("saveScratch"),
-        strikeScratch: document.getElementById("strikeScratch"),
-        scribble1: document.getElementById("scribble1"),
-        scribble2: document.getElementById("scribble2"),
-        scribble3: document.getElementById("scribble3")
+      const el = {
+        telefon: document.querySelector(".telefon"),
+        gorevListesi: document.getElementById("gorevListesi"),
+        sayaclar: document.getElementById("sayaclar"),
+        ozetSatiri: document.getElementById("ozetSatiri"),
+        aramaKutusu: document.getElementById("aramaKutusu"),
+        tamamlananlariSil: document.getElementById("tamamlananlariSil"),
+        temaDegistir: document.getElementById("temaDegistir"),
+        tumFiltreyiTemizle: document.getElementById("tumFiltreyiTemizle"),
+        notAlani: document.getElementById("notAlani"),
+        ekleButonu: document.getElementById("ekleButonu"),
+        modal: document.getElementById("modal"),
+        gorevFormu: document.getElementById("gorevFormu"),
+        modalBaslik: document.getElementById("modalBaslik"),
+        gorevBaslik: document.getElementById("gorevBaslik"),
+        gorevDetay: document.getElementById("gorevDetay"),
+        gorevOncelik: document.getElementById("gorevOncelik"),
+        gorevDurum: document.getElementById("gorevDurum"),
+        iptalButonu: document.getElementById("iptalButonu")
       };
 
-      function seedTasks() {
+      function varsayilanGorevler() {
         return [
           {
-            id: makeId(),
-            title: "Submit bugfix before 11:00",
-            detail: "owner me // deploy notes still missing",
-            state: "urgent",
-            priority: "high",
-            checkboxStyle: "box"
+            id: idUret(),
+            baslik: "Sunum taslağını bitir",
+            detay: "Saat 17:00'ye kadar ilk sürüm hazır olsun.",
+            durum: "acil",
+            oncelik: "yuksek"
           },
           {
-            id: makeId(),
-            title: "Send invoice draft",
-            detail: "done but still staring at me",
-            state: "done",
-            priority: "medium",
-            checkboxStyle: "hand"
+            id: idUret(),
+            baslik: "E-postaları kontrol et",
+            detay: "Yanıt bekleyen kritik mesajları cevapla.",
+            durum: "yapilacak",
+            oncelik: "orta"
           },
           {
-            id: makeId(),
-            title: "Clean downloads folder",
-            detail: "ignored forever maybe",
-            state: "ignored",
-            priority: "low",
-            checkboxStyle: "box"
+            id: idUret(),
+            baslik: "Fatura gönderimini tamamla",
+            detay: "Muhasebe için PDF çıktısını ilet.",
+            durum: "tamamlandi",
+            oncelik: "orta"
           },
           {
-            id: makeId(),
-            title: "Water plant",
-            detail: "still alive somehow",
-            state: "todo",
-            priority: "low",
-            checkboxStyle: "hand"
-          },
-          {
-            id: makeId(),
-            title: "Reply unread messages",
-            detail: "17 threads already on fire",
-            state: "todo",
-            priority: "medium",
-            checkboxStyle: "box"
+            id: idUret(),
+            baslik: "Dosya arşivini düzenle",
+            detay: "Zaman kalırsa yapılacak.",
+            durum: "ertelendi",
+            oncelik: "dusuk"
           }
         ];
       }
 
-      function makeId() {
-        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      function idUret() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
       }
 
-      function load() {
-        try {
-          const raw = localStorage.getItem(TASKS_KEY);
-          state.tasks = raw ? JSON.parse(raw) : seedTasks();
-          if (!Array.isArray(state.tasks) || !state.tasks.length) {
-            state.tasks = seedTasks();
-          }
-        } catch (_err) {
-          state.tasks = seedTasks();
-        }
-
-        nodes.scratchpad.value = localStorage.getItem(SCRATCH_KEY) || "stop pretending this is organized";
-        state.accent = localStorage.getItem(ACCENT_KEY) || "yellow";
-        if (state.accent === "red") {
-          nodes.phone.classList.add("accent-red");
-        }
-      }
-
-      function persist() {
-        localStorage.setItem(TASKS_KEY, JSON.stringify(state.tasks));
-      }
-
-      function escapeHtml(value) {
-        return value
+      function metinGuvenli(metin) {
+        return metin
           .replaceAll("&", "&amp;")
           .replaceAll("<", "&lt;")
           .replaceAll(">", "&gt;")
@@ -724,297 +606,258 @@
           .replaceAll("'", "&#39;");
       }
 
-      function renderMeta() {
-        const all = state.tasks.length;
-        const urgent = state.tasks.filter((task) => task.state === "urgent").length;
-        const done = state.tasks.filter((task) => task.state === "done").length;
-        const ignored = state.tasks.filter((task) => task.state === "ignored").length;
-        const open = all - done - ignored;
-        nodes.todayMeta.textContent = all + " tasks // open " + open + " // urgent " + urgent + " // done " + done + " // ignored " + ignored;
-      }
-
-      function filterTasks() {
-        if (state.filter === "all") {
-          return state.tasks.slice();
-        }
-        return state.tasks.filter((task) => task.state === state.filter);
-      }
-
-      function computeLayout(index, task) {
-        const base = LAYOUTS[index % LAYOUTS.length];
-        const randomShift = (state.chaosShift + index * 3) % 17;
-        const x = base.left + randomShift - 8;
-        const y = base.top + ((state.chaosShift * 2 + index * 9) % 21) - 10;
-        const rotation = base.rotate + ((state.chaosShift + index) % 7) - 3;
-        let width = "";
-        if (task.priority === "low") {
-          width = "138px";
-        }
-        if (task.priority === "high" || task.state === "urgent") {
-          width = "316px";
-        }
-        return { x: x, y: y, rotation: rotation, width: width };
-      }
-
-      function cardClass(task) {
-        const classes = ["task-card"];
-        if (task.state === "urgent") classes.push("urgent");
-        if (task.state === "done") classes.push("done");
-        if (task.state === "ignored") classes.push("ignored");
-        if (task.priority === "low") classes.push("low");
-        return classes.join(" ");
-      }
-
-      function taskDone(task) {
-        return task.state === "done";
-      }
-
-      function renderBoard() {
-        const visible = filterTasks();
-        nodes.board.innerHTML = "";
-
-        visible.forEach((task, index) => {
-          const layout = computeLayout(index, task);
-          const done = taskDone(task);
-          const card = document.createElement("article");
-          card.className = cardClass(task);
-          card.dataset.id = task.id;
-          card.style.top = layout.y + "px";
-          card.style.left = layout.x + "px";
-          card.style.transform = "rotate(" + layout.rotation + "deg)";
-          if (layout.width) {
-            card.style.width = layout.width;
+      function yukle() {
+        try {
+          const gorevJson = localStorage.getItem(GOREVLER_KEY);
+          state.gorevler = gorevJson ? JSON.parse(gorevJson) : varsayilanGorevler();
+          if (!Array.isArray(state.gorevler) || state.gorevler.length === 0) {
+            state.gorevler = varsayilanGorevler();
           }
+        } catch (_err) {
+          state.gorevler = varsayilanGorevler();
+        }
 
-          const checkClass = task.checkboxStyle === "hand" ? "checkbox-hand" : "checkbox-box";
-          card.innerHTML =
-            '<div class="task-header">' +
-            "<h3>" + escapeHtml(task.title) + "</h3>" +
-            '<div class="chip-wrap">' +
-            '<span class="chip">' + task.state + "</span>" +
-            '<span class="chip">' + task.priority + "</span>" +
-            "</div>" +
-            "</div>" +
-            '<p class="task-desc">' + escapeHtml(task.detail) + "</p>" +
-            '<div class="checkbox-row">' +
-            '<button class="checkbox-btn" type="button" data-action="toggle-done" aria-label="Toggle done">' +
-            '<span class="' + checkClass + (done ? " checked" : "") + '"></span>' +
-            "</button>" +
-            "<span>" + (done ? "done-ish" : "still pending") + "</span>" +
-            "</div>" +
-            '<div class="task-actions">' +
-            '<button type="button" data-action="urgent">urgent</button>' +
-            '<button type="button" data-action="ignore">ignore</button>' +
-            '<button type="button" data-action="edit">edit</button>' +
-            '<button type="button" data-action="delete">delete</button>' +
-            "</div>";
-          nodes.board.appendChild(card);
+        el.notAlani.value = localStorage.getItem(NOT_KEY) || "";
+        state.tema = localStorage.getItem(TEMA_KEY) || "mavi";
+        el.telefon.classList.toggle("tema-yesil", state.tema === "yesil");
+      }
+
+      function kaydetGorevler() {
+        localStorage.setItem(GOREVLER_KEY, JSON.stringify(state.gorevler));
+      }
+
+      function goreviBul(id) {
+        return state.gorevler.find((gorev) => gorev.id === id);
+      }
+
+      function gorevleriGetir() {
+        const filtreli = state.aktifFiltre === "tumu"
+          ? state.gorevler.slice()
+          : state.gorevler.filter((gorev) => gorev.durum === state.aktifFiltre);
+
+        const arama = state.arama.trim().toLocaleLowerCase("tr");
+        if (!arama) return filtreli;
+
+        return filtreli.filter((gorev) => {
+          const metin = (gorev.baslik + " " + gorev.detay).toLocaleLowerCase("tr");
+          return metin.includes(arama);
         });
       }
 
-      function renderFragmentList() {
-        const items = state.tasks
-          .filter((task) => task.priority === "low" || task.state === "ignored" || task.state === "todo")
-          .slice(0, 9);
+      function sayaclariCiz() {
+        const tumu = state.gorevler.length;
+        const yapilacak = state.gorevler.filter((g) => g.durum === "yapilacak").length;
+        const acil = state.gorevler.filter((g) => g.durum === "acil").length;
+        const tamamlandi = state.gorevler.filter((g) => g.durum === "tamamlandi").length;
+        const ertelendi = state.gorevler.filter((g) => g.durum === "ertelendi").length;
 
-        nodes.fragmentItems.innerHTML = "";
-        items.forEach((task) => {
-          const row = document.createElement("div");
-          row.className = "fragment-item" + (task.state === "ignored" ? " ignored" : "");
-          row.dataset.id = task.id;
-          row.innerHTML =
-            "<span>" + escapeHtml(task.title) + " (" + task.state + ")</span>" +
-            '<div class="mini-actions">' +
-            '<button type="button" data-frag-action="restore">restore</button>' +
-            '<button type="button" data-frag-action="done">done</button>' +
-            "</div>";
-          nodes.fragmentItems.appendChild(row);
+        el.sayaclar.innerHTML = [
+          '<span class="rozet">Toplam: ' + tumu + "</span>",
+          '<span class="rozet">Yapılacak: ' + yapilacak + "</span>",
+          '<span class="rozet">Acil: ' + acil + "</span>",
+          '<span class="rozet">Tamamlandı: ' + tamamlandi + "</span>",
+          '<span class="rozet">Ertelendi: ' + ertelendi + "</span>"
+        ].join("");
+
+        el.ozetSatiri.textContent = "Açık görev: " + (yapilacak + acil) + " • Bugün odağını koru.";
+      }
+
+      function filtreDugmeleriniCiz() {
+        document.querySelectorAll("[data-filtre]").forEach((dugme) => {
+          dugme.classList.toggle("aktif", dugme.dataset.filtre === state.aktifFiltre);
         });
       }
 
-      function renderFilterButtons() {
-        document.querySelectorAll("[data-filter]").forEach((button) => {
-          button.classList.toggle("active", button.dataset.filter === state.filter);
-        });
+      function gorevKartSinifi(gorev) {
+        const siniflar = ["gorev-karti"];
+        if (gorev.durum === "tamamlandi") siniflar.push("tamamlandi");
+        if (gorev.durum === "ertelendi") siniflar.push("ertelendi");
+        return siniflar.join(" ");
       }
 
-      function renderScribbles() {
-        const index = state.chaosShift % SCRIBBLES.length;
-        nodes.scribble1.textContent = SCRIBBLES[index];
-        nodes.scribble2.textContent = SCRIBBLES[(index + 2) % SCRIBBLES.length];
-        nodes.scribble3.textContent = SCRIBBLES[(index + 4) % SCRIBBLES.length];
+      function gorevKartiniCiz(gorev) {
+        return (
+          '<article class="' + gorevKartSinifi(gorev) + '" data-id="' + gorev.id + '">' +
+            '<div class="gorev-ust">' +
+              '<h3 class="gorev-baslik">' + metinGuvenli(gorev.baslik) + "</h3>" +
+              '<div class="etiketler">' +
+                '<span class="etiket durum-' + gorev.durum + '">' + durumEtiketi[gorev.durum] + "</span>" +
+                '<span class="etiket oncelik-' + gorev.oncelik + '">' + oncelikEtiketi[gorev.oncelik] + "</span>" +
+              "</div>" +
+            "</div>" +
+            '<p class="gorev-detay">' + metinGuvenli(gorev.detay || "Detay girilmedi.") + "</p>" +
+            '<div class="gorev-alt">' +
+              '<button class="durum-dugmesi" type="button" data-islem="durum-degistir">' + (gorev.durum === "tamamlandi" ? "Yapılacak olarak işaretle" : "Tamamlandı olarak işaretle") + "</button>" +
+              '<div class="gorev-aksiyonlar">' +
+                '<button type="button" data-islem="acil-yap">Acil yap</button>' +
+                '<button type="button" data-islem="ertele">Ertele</button>' +
+                '<button type="button" data-islem="duzenle">Düzenle</button>' +
+                '<button type="button" data-islem="sil">Sil</button>' +
+              "</div>" +
+            "</div>" +
+          "</article>"
+        );
       }
 
-      function render() {
-        renderMeta();
-        renderFilterButtons();
-        renderBoard();
-        renderFragmentList();
-        renderScribbles();
+      function gorevleriCiz() {
+        const liste = gorevleriGetir();
+        if (liste.length === 0) {
+          el.gorevListesi.innerHTML = '<div class="bos-durum">Bu filtrede görev bulunamadı.</div>';
+          return;
+        }
+        el.gorevListesi.innerHTML = liste.map(gorevKartiniCiz).join("");
       }
 
-      function setTaskState(task, nextState) {
-        task.state = nextState;
+      function ciz() {
+        sayaclariCiz();
+        filtreDugmeleriniCiz();
+        gorevleriCiz();
       }
 
-      function findTaskById(id) {
-        return state.tasks.find((task) => task.id === id);
+      function modalAc(gorev) {
+        state.duzenlenenId = gorev ? gorev.id : null;
+        el.modalBaslik.textContent = gorev ? "Görevi düzenle" : "Yeni görev ekle";
+        el.gorevBaslik.value = gorev ? gorev.baslik : "";
+        el.gorevDetay.value = gorev ? gorev.detay : "";
+        el.gorevOncelik.value = gorev ? gorev.oncelik : "orta";
+        el.gorevDurum.value = gorev ? gorev.durum : "yapilacak";
+        el.modal.classList.add("acik");
+        el.gorevBaslik.focus();
       }
 
-      function handleBoardClick(event) {
-        const actionButton = event.target.closest("[data-action]");
-        if (!actionButton) return;
-        const card = event.target.closest(".task-card");
-        if (!card) return;
-        const task = findTaskById(card.dataset.id);
-        if (!task) return;
+      function modalKapat() {
+        state.duzenlenenId = null;
+        el.modal.classList.remove("acik");
+        el.gorevFormu.reset();
+      }
 
-        const action = actionButton.dataset.action;
-        if (action === "toggle-done") {
-          setTaskState(task, task.state === "done" ? "todo" : "done");
-        } else if (action === "urgent") {
-          setTaskState(task, task.state === "urgent" ? "todo" : "urgent");
-          task.priority = "high";
-        } else if (action === "ignore") {
-          setTaskState(task, task.state === "ignored" ? "todo" : "ignored");
-        } else if (action === "delete") {
-          state.tasks = state.tasks.filter((item) => item.id !== task.id);
-        } else if (action === "edit") {
-          openComposer(task);
+      function gorevKaydet(event) {
+        event.preventDefault();
+        const baslik = el.gorevBaslik.value.trim();
+        const detay = el.gorevDetay.value.trim();
+        const oncelik = el.gorevOncelik.value;
+        const durum = el.gorevDurum.value;
+
+        if (!baslik) {
+          el.gorevBaslik.focus();
           return;
         }
 
-        persist();
-        render();
-      }
-
-      function handleFragmentClick(event) {
-        const button = event.target.closest("[data-frag-action]");
-        if (!button) return;
-        const row = event.target.closest(".fragment-item");
-        if (!row) return;
-        const task = findTaskById(row.dataset.id);
-        if (!task) return;
-
-        const action = button.dataset.fragAction;
-        if (action === "restore") {
-          setTaskState(task, "todo");
-        } else if (action === "done") {
-          setTaskState(task, "done");
-        }
-
-        persist();
-        render();
-      }
-
-      function openComposer(task) {
-        state.editingId = task ? task.id : null;
-        nodes.composer.classList.add("open");
-        nodes.composerTitle.textContent = task ? "Edit task" : "Add task";
-        nodes.taskTitle.value = task ? task.title : "";
-        nodes.taskDetail.value = task ? task.detail : "";
-        nodes.taskPriority.value = task ? task.priority : "medium";
-        nodes.taskState.value = task ? task.state : "todo";
-        nodes.taskTitle.focus();
-      }
-
-      function closeComposer() {
-        state.editingId = null;
-        nodes.composer.classList.remove("open");
-      }
-
-      function saveComposer() {
-        const title = nodes.taskTitle.value.trim();
-        const detail = nodes.taskDetail.value.trim();
-        const priority = nodes.taskPriority.value;
-        const nextState = nodes.taskState.value;
-        if (!title) {
-          nodes.taskTitle.focus();
-          return;
-        }
-
-        if (state.editingId) {
-          const task = findTaskById(state.editingId);
-          if (task) {
-            task.title = title;
-            task.detail = detail || "no detail";
-            task.priority = priority;
-            task.state = nextState;
+        if (state.duzenlenenId) {
+          const gorev = goreviBul(state.duzenlenenId);
+          if (gorev) {
+            gorev.baslik = baslik;
+            gorev.detay = detay;
+            gorev.oncelik = oncelik;
+            gorev.durum = durum;
           }
         } else {
-          state.tasks.unshift({
-            id: makeId(),
-            title: title,
-            detail: detail || "no detail",
-            state: nextState,
-            priority: priority,
-            checkboxStyle: Math.random() > 0.5 ? "box" : "hand"
+          state.gorevler.unshift({
+            id: idUret(),
+            baslik: baslik,
+            detay: detay,
+            oncelik: oncelik,
+            durum: durum
           });
         }
 
-        persist();
-        closeComposer();
-        render();
+        kaydetGorevler();
+        modalKapat();
+        ciz();
       }
 
-      function shuffleChaos() {
-        state.chaosShift = (state.chaosShift + 5 + Math.floor(Math.random() * 13)) % 1000;
-        render();
+      function gorevSil(id) {
+        state.gorevler = state.gorevler.filter((gorev) => gorev.id !== id);
       }
 
-      function wipeDone() {
-        state.tasks = state.tasks.filter((task) => task.state !== "done");
-        persist();
-        render();
+      function kartIslemleriniYonet(event) {
+        const dugme = event.target.closest("[data-islem]");
+        if (!dugme) return;
+        const kart = event.target.closest("[data-id]");
+        if (!kart) return;
+        const gorev = goreviBul(kart.dataset.id);
+        if (!gorev) return;
+
+        const islem = dugme.dataset.islem;
+        if (islem === "durum-degistir") {
+          gorev.durum = gorev.durum === "tamamlandi" ? "yapilacak" : "tamamlandi";
+        } else if (islem === "acil-yap") {
+          gorev.durum = "acil";
+          gorev.oncelik = "yuksek";
+        } else if (islem === "ertele") {
+          gorev.durum = "ertelendi";
+        } else if (islem === "duzenle") {
+          modalAc(gorev);
+          return;
+        } else if (islem === "sil") {
+          gorevSil(gorev.id);
+        }
+
+        kaydetGorevler();
+        ciz();
       }
 
-      function setFilter(filter) {
-        if (!FILTERS.has(filter)) return;
-        state.filter = filter;
-        render();
+      function tamamlananlariTemizle() {
+        state.gorevler = state.gorevler.filter((gorev) => gorev.durum !== "tamamlandi");
+        kaydetGorevler();
+        ciz();
       }
 
-      function toggleAccent() {
-        state.accent = state.accent === "yellow" ? "red" : "yellow";
-        nodes.phone.classList.toggle("accent-red", state.accent === "red");
-        localStorage.setItem(ACCENT_KEY, state.accent);
+      function temaDegistir() {
+        state.tema = state.tema === "mavi" ? "yesil" : "mavi";
+        el.telefon.classList.toggle("tema-yesil", state.tema === "yesil");
+        localStorage.setItem(TEMA_KEY, state.tema);
       }
 
-      function saveScratch() {
-        localStorage.setItem(SCRATCH_KEY, nodes.scratchpad.value);
+      function filtreSec(filtre) {
+        if (!GECERLI_FILTRELER.has(filtre)) return;
+        state.aktifFiltre = filtre;
+        ciz();
       }
 
-      function strikeScratch() {
-        state.scratchedOut = !state.scratchedOut;
-        nodes.scratchpad.style.textDecoration = state.scratchedOut ? "line-through" : "none";
-        nodes.scratchpad.style.textDecorationThickness = state.scratchedOut ? "3px" : "0";
+      function filtreleriSifirla() {
+        state.aktifFiltre = "tumu";
+        state.arama = "";
+        el.aramaKutusu.value = "";
+        ciz();
       }
 
-      function attachEvents() {
-        nodes.board.addEventListener("click", handleBoardClick);
-        nodes.fragmentItems.addEventListener("click", handleFragmentClick);
-
-        document.querySelectorAll("[data-filter]").forEach((button) => {
-          button.addEventListener("click", function () {
-            setFilter(button.dataset.filter);
+      function olaylariBagla() {
+        document.querySelectorAll("[data-filtre]").forEach((dugme) => {
+          dugme.addEventListener("click", function () {
+            filtreSec(dugme.dataset.filtre);
           });
         });
 
-        nodes.addTaskBtn.addEventListener("click", function () {
-          openComposer(null);
+        el.aramaKutusu.addEventListener("input", function () {
+          state.arama = el.aramaKutusu.value;
+          ciz();
         });
-        nodes.cancelTaskBtn.addEventListener("click", closeComposer);
-        nodes.saveTaskBtn.addEventListener("click", saveComposer);
-        nodes.shuffleBtn.addEventListener("click", shuffleChaos);
-        nodes.clearDoneBtn.addEventListener("click", wipeDone);
-        nodes.accentBtn.addEventListener("click", toggleAccent);
-        nodes.saveScratch.addEventListener("click", saveScratch);
-        nodes.strikeScratch.addEventListener("click", strikeScratch);
+
+        el.gorevListesi.addEventListener("click", kartIslemleriniYonet);
+        el.ekleButonu.addEventListener("click", function () {
+          modalAc(null);
+        });
+        el.iptalButonu.addEventListener("click", modalKapat);
+        el.modal.addEventListener("click", function (event) {
+          if (event.target === el.modal) {
+            modalKapat();
+          }
+        });
+
+        el.gorevFormu.addEventListener("submit", gorevKaydet);
+        el.tamamlananlariSil.addEventListener("click", tamamlananlariTemizle);
+        el.temaDegistir.addEventListener("click", temaDegistir);
+        el.tumFiltreyiTemizle.addEventListener("click", filtreleriSifirla);
+
+        el.notAlani.addEventListener("input", function () {
+          localStorage.setItem(NOT_KEY, el.notAlani.value);
+        });
       }
 
-      load();
-      attachEvents();
-      render();
+      yukle();
+      olaylariBagla();
+      ciz();
     })();
   </script>
 </body>
